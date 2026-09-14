@@ -121,7 +121,7 @@ class Flowed(gl.Contract):
                     response = gl.nondet.web.get(src["url"])
                     status = getattr(response, "status_code", 200)
                     body = response.body.decode("utf-8", errors="replace") if isinstance(response.body, bytes) else str(response.body)
-                    if status < 200 or status >= 300 or not body.strip(): raise ValueError("unusable source")
+                    if status < 200 or status >= 300 or not body.strip(): raise gl.vm.UserError("unusable source")
                     out.append({"label": src["label"], "url": src["url"], "required": src["required"], "body": body[:2800]})
                 except Exception:
                     if src["required"]: required_unavailable = True
