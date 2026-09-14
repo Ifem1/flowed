@@ -66,6 +66,7 @@ class Flowed(gl.Contract):
                 urls.add(src["url"]); required += int(src["required"])
             assert required > 0
             amount = int(s["amount_wei"]); assert amount > 0 and amount // 20 > 0
+            s["amount_wei"] = amount
             total += amount
         return steps, total
 
@@ -116,11 +117,16 @@ class Flowed(gl.Contract):
         def fetch():
             out = []; required_unavailable = False
             for src in step["sources"]:
-                try: out.append({"label": src["label"], "url": src["url"], "required": src["required"], "body": gl.nondet.web.get(src["url"]).body.decode("utf-8")[:3000]})
+                try:
+                    response = gl.nondet.web.get(src["url"])
+                    status = getattr(response, "status_code", 200)
+                    body = response.body.decode("utf-8", errors="replace") if isinstance(response.body, bytes) else str(response.body)
+                    if status < 200 or status >= 300 or not body.strip(): raise ValueError("unusable source")
+                    out.append({"label": src["label"], "url": src["url"], "required": src["required"], "body": body[:2800]})
                 except Exception:
                     if src["required"]: required_unavailable = True
                     out.append({"label": src["label"], "url": src["url"], "required": src["required"], "status": "SOURCE_UNAVAILABLE"})
-            return json.dumps({"sources":out,"required_unavailable":required_unavailable}, sort_keys=True, separators=(",", ":"))[:12000]
+            return json.dumps({"sources":out,"required_unavailable":required_unavailable}, sort_keys=True, separators=(",", ":"))
         snap = gl.eq_principle.strict_eq(fetch)
         unavailable = json.loads(snap).get("required_unavailable", False)
         return snap, hashlib.sha256(snap.encode()).hexdigest(), unavailable
@@ -140,12 +146,12 @@ class Flowed(gl.Contract):
     @gl.public.write
     def review_active_step(self, flow_id: u256):
         f = self._flow(flow_id); assert f["state"] == "ACTIVE" and str(gl.message.sender_address) == f["recipient"]
-        s = f["steps"][f["active"]]; assert _now() <= s["deadline"]
+        s = f["steps"][f["active"]]; latest = f.get("last_review_label", ""); assert _now() <= s["deadline"] or (latest in ("SOURCE_UNAVAILABLE", "INCONCLUSIVE", "MODEL_OUTPUT_INVALID") and _now() <= s["deadline"] + RECOVERY)
         assert _now() >= f.get("last_review_at", 0) + RETRY
         snapshot, digest, unavailable = self._snapshot(f, s); result = "SOURCE_UNAVAILABLE" if unavailable else self._classify(s["criteria"], snapshot)
         f["review_attempts"] += 1; f["last_review_at"] = _now()
         f["manifests"].append({"flow_id": flow_id, "step_index": f["active"], "phase": "PRIMARY", "round": f["review_attempts"], "timestamp": _now(), "label": result, "snapshot_digest": digest, "source_count": len(s["sources"])})
-        s["last_review_label"] = result; s["snapshot_digest"] = digest
+        s["last_review_label"] = result; s["snapshot_digest"] = digest; f["last_review_label"] = result
         if result == "SATISFIED": f["state"] = "PROVISIONAL"; f["contest_deadline"] = _now() + f["contest_window"]; s["snapshot"] = snapshot
         self.flows[flow_id] = json.dumps(f)
 
@@ -153,7 +159,7 @@ class Flowed(gl.Contract):
     def contest_active_step(self, flow_id: u256):
         f = self._flow(flow_id); assert f["state"] == "PROVISIONAL" and str(gl.message.sender_address) == f["payer"] and _now() < f["contest_deadline"]
         bond = f["steps"][f["active"]]["amount_wei"] // 20; assert gl.message.value == bond
-        f["state"] = "CONTESTED"; f["contest_bond"] = bond; f["contest_opened_at"] = _now(); f["contest_attempts"] = 0; f["last_contest_at"] = 0; self.bonds_received += bond; self.bonds_locked += bond; self.flows[flow_id] = json.dumps(f)
+        f["state"] = "CONTESTED"; f["contest_bond"] = bond; f["contest_opened_at"] = _now(); f["contest_attempts"] = 0; f["last_contest_at"] = 0; f["bonds_received"] = f.get("bonds_received", 0) + bond; f["bonds_locked"] = f.get("bonds_locked", 0) + bond; self.bonds_received += bond; self.bonds_locked += bond; self.flows[flow_id] = json.dumps(f)
 
     @gl.public.write
     def finalize_active_step(self, flow_id: u256):
@@ -165,17 +171,17 @@ class Flowed(gl.Contract):
         assert _now() >= f["last_contest_at"] + RETRY; result = self._classify(s["criteria"], s["snapshot"]); f["contest_attempts"] += 1; f["last_contest_at"] = _now(); f["manifests"].append({"flow_id": flow_id, "step_index": f["active"], "phase": "CONTEST", "round": f["contest_attempts"], "timestamp": _now(), "label": result, "snapshot_digest": s["snapshot_digest"], "source_count": len(s["sources"])})
         if result not in ("SATISFIED", "NOT_SATISFIED"): self.flows[flow_id] = json.dumps(f); return
         self.bonds_locked -= f["contest_bond"]
-        if result == "SATISFIED": self.bonds_forfeited += f["contest_bond"]; self._send(f["recipient"], f["contest_bond"]); self._release(f, flow_id)
-        else: self.bonds_returned += f["contest_bond"]; self._send(f["payer"], f["contest_bond"]); f["state"] = "ACTIVE"; f["contest_bond"] = 0; self.flows[flow_id] = json.dumps(f)
+        if result == "SATISFIED": self.bonds_forfeited += f["contest_bond"]; f["bonds_locked"] -= f["contest_bond"]; f["bonds_forfeited"] = f.get("bonds_forfeited", 0) + f["contest_bond"]; self._send(f["recipient"], f["contest_bond"]); self._release(f, flow_id)
+        else: self.bonds_returned += f["contest_bond"]; f["bonds_locked"] -= f["contest_bond"]; f["bonds_returned"] = f.get("bonds_returned", 0) + f["contest_bond"]; self._send(f["payer"], f["contest_bond"]); f["state"] = "ACTIVE"; f["contest_bond"] = 0; self.flows[flow_id] = json.dumps(f)
 
     @gl.public.write
     def finalize_stalled_contest(self, flow_id: u256):
         f = self._flow(flow_id); assert f["state"] == "CONTESTED" and _now() >= f["contest_opened_at"] + RECOVERY
-        self.bonds_locked -= f["contest_bond"]; self.bonds_returned += f["contest_bond"]; self._send(f["payer"], f["contest_bond"]); f["contest_bond"] = 0; self._release(f, flow_id)
+        self.bonds_locked -= f["contest_bond"]; f["bonds_locked"] -= f["contest_bond"]; self.bonds_returned += f["contest_bond"]; f["bonds_returned"] = f.get("bonds_returned", 0) + f["contest_bond"]; self._send(f["payer"], f["contest_bond"]); f["contest_bond"] = 0; self._release(f, flow_id)
 
     def _release(self, f, fid):
         amount = f["steps"][f["active"]]["amount_wei"]; self._send(f["recipient"], amount); self.released += amount; f["released"] += amount; f["remaining"] -= amount
-        f["active"] += 1; f["contest_bond"] = 0
+        f["active"] += 1; f["contest_bond"] = 0; f["review_attempts"] = 0; f["last_review_at"] = 0; f["last_review_label"] = ""
         if f["active"] >= len(f["steps"]): f["state"] = "COMPLETED"
         else: f["state"] = "ACTIVE"; f["steps"][f["active"]]["activated_at"] = _now(); f["steps"][f["active"]]["deadline"] = _now() + f["steps"][f["active"]]["ttl_seconds"]
         self.flows[fid] = json.dumps(f)
