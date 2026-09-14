@@ -16,6 +16,11 @@ BOND_BPS = 500
 LABELS = ("SATISFIED", "NOT_SATISFIED", "INCONCLUSIVE")
 STATES = ("OFFERED", "ACTIVE", "PROVISIONAL", "CONTESTED", "COMPLETED", "DECLINED", "WITHDRAWN", "EXPIRED", "ABANDONED")
 
+@gl.evm.contract_interface
+class _Recipient:
+    class View: pass
+    class Write: pass
+
 def _valid_url(url: str) -> bool:
     if not isinstance(url, str) or not url.startswith("https://") or "@" in url:
         return False
@@ -107,11 +112,7 @@ class Flowed(gl.Contract):
 
     def _send(self, to, amount):
         assert amount > 0
-        @gl.evm.contract_interface
-        class Recipient:
-            class View: pass
-            class Write: pass
-        Recipient(Address(to)).emit_transfer(value=u256(amount))
+        _Recipient(Address(to)).emit_transfer(value=u256(amount), on="finalized")
 
     def _snapshot(self, f, step):
         def fetch():
