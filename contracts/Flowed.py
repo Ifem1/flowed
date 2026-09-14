@@ -1,8 +1,10 @@
+# { "Depends": "py-genlayer:test" }
 """Flowed: funded sequential semantic workflows for GenLayer Studionet (61999).
 
 The contract keeps the consensus surface deliberately scalar. Models classify only
 the frozen active-step snapshot; every monetary transition below is deterministic.
 """
+import genlayer as gl
 from genlayer import *
 import hashlib, json, re
 
@@ -173,6 +175,6 @@ class Flowed(gl.Contract):
         self._send(f["payer"], f["remaining"]); self.refunded += f["remaining"]; f["refunded"] += f["remaining"]; f["remaining"] = 0; f["state"] = state; self.flows[fid] = f
 
     @gl.public.view
-    def get_flow(self, flow_id: u256): return self.flows[flow_id]
+    def get_flow(self, flow_id: u256) -> dict: return self.flows[flow_id]
     @gl.public.view
-    def get_accounting(self): return {"funded": self.funded, "released": self.released, "refunded": self.refunded, "remaining": self.funded - self.released - self.refunded, "bonds_received": self.bonds_received, "bonds_locked": self.bonds_locked, "bonds_returned": self.bonds_returned, "bonds_forfeited": self.bonds_forfeited}
+    def get_accounting(self) -> dict: return {"funded": self.funded, "released": self.released, "refunded": self.refunded, "remaining": self.funded - self.released - self.refunded, "bonds_received": self.bonds_received, "bonds_locked": self.bonds_locked, "bonds_returned": self.bonds_returned, "bonds_forfeited": self.bonds_forfeited}
