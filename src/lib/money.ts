@@ -1,0 +1,2 @@
+export function parseGen(value: string): bigint { if (!/^\d+(\.\d{1,18})?$/.test(value.trim())) throw new Error('Invalid GEN amount'); const [whole, fraction=''] = value.trim().split('.'); return BigInt(whole)*10n**18n+BigInt(fraction.padEnd(18,'0')); }
+export function formatGen(wei: bigint): string { if (wei<0n) throw new Error('Negative GEN'); const whole=wei/10n**18n; const fraction=(wei%10n**18n).toString().padStart(18,'0').replace(/0+$/,''); return fraction?`${whole}.${fraction}`:whole.toString(); }

@@ -1,0 +1,1 @@
+{"name":"flowed","private":true,"scripts":{"typecheck":"tsc --noEmit","test":"node --test tests/frontend/money.test.mjs","build":"node scripts/build.mjs","lint":"eslint ."},"devDependencies":{"typescript":"^5.6.0","eslint":"^9.0.0"}}
