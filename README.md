@@ -6,7 +6,7 @@ Flowed is a funded semantic workflow protocol: a payer freezes a sequence of wor
 
 ## Current build
 
-This repository contains the responsive product surface and interaction model for Flowed. It is a static, dependency-free frontend slice designed to be wired to the canonical GenLayer Studionet deployment (chain ID **61999**) once the pinned contract SDK and wallet credentials are available. It does not claim a live contract, deployment, or fake transaction success.
+This repository contains the Flowed contract, protocol tests, exact-money utilities, TypeScript protocol boundary, responsive product surface, deployment runner, and reviewer documentation. The contract targets GenLayer Studionet (chain ID **61999**) and does not claim a live contract, deployment, or fake transaction success.
 
 Open `index.html` in a browser to inspect the experience. The demo data is clearly presentational and is not a substitute for contract reads.
 
@@ -16,4 +16,4 @@ The production implementation should use one contract, `contracts/Flowed.py`, wi
 
 ## Next integration gate
 
-Add the pinned `genlayer-js` client and contract once the deployment environment is available; then replace the presentational data in `app.js` with public reads and wallet-gated writes, wait for finalized execution, and record the canonical address, source commit, transaction hashes, and live 3-step verification in `docs/LIVE_VERIFICATION.md`.
+Install the pinned `genlayer-js` client in the deployment environment, bind `src/lib/protocol.ts` to its public reads and finalized wallet-gated writes, then run `node scripts/live_full.mjs` with secure `FLOWED_PRIVATE_KEY` and `FLOWED_CONTRACT_ADDRESS` values. Record the canonical address, source commit, transaction hashes, and live 3-step verification in `docs/LIVE_VERIFICATION.md`.
