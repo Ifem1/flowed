@@ -1,8 +1,4 @@
-const flows = [
-  {id:'014', title:'Launch analytics dashboard', role:'Receiving', status:'PROVISIONAL', desc:'Ship the production dashboard and complete the handover.', amount:'0.03', released:'0.01', step:2, total:3, current:'Frontend live', due:'Contest closes in 18h'},
-  {id:'013', title:'Brand system refresh', role:'Receiving', status:'ACTIVE', desc:'A cohesive visual language for the next product chapter.', amount:'0.04', released:'0.02', step:3, total:4, current:'Handover complete', due:'Due in 2 days'},
-  {id:'012', title:'Mobile onboarding flow', role:'Paying', status:'ACTIVE', desc:'A faster, clearer first-run experience for new users.', amount:'0.02', released:'0.00', step:1, total:2, current:'Prototype approved', due:'Due in 5 days'}
-];
+const flows = window.FLOWED_LIVE_FLOWS || [];
 const grid = document.querySelector('#flow-grid'), list = document.querySelector('#flow-list');
 function card(f){return `<article class="flow-card" data-id="${f.id}"><div class="flow-top"><span class="status ${f.status==='ACTIVE'?'active':'provisional'}">${f.status}</span><span class="eyebrow">#${f.id}</span></div><h3>${f.title}</h3><p>${f.desc}</p><div class="progress">${Array.from({length:f.total},(_,i)=>`<i class="${i<f.step-1?'done':i===f.step-1?'current':''}"></i>`).join('')}</div><div class="flow-meta"><span>Step ${f.step} of ${f.total}</span><b>${f.amount} GEN</b></div>${f.status==='PROVISIONAL'?`<div class="due">${f.due}</div>`:''}</article>`}
 grid.innerHTML=flows.map(card).join(''); list.innerHTML=flows.map(card).join('');

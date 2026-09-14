@@ -9,7 +9,9 @@ export const flowedChain = {
 } as const;
 
 export const flowedAbi = [
-  { type: 'function', name: 'get_flow', stateMutability: 'view', inputs: [{ name: 'flow_id', type: 'uint256' }], outputs: [{ type: 'tuple' }] },
+  { type: 'function', name: 'get_flow_count', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+  { type: 'function', name: 'get_flow', stateMutability: 'view', inputs: [{ name: 'flow_id', type: 'uint256' }], outputs: [{ type: 'string' }] },
+  { type: 'function', name: 'get_active_step', stateMutability: 'view', inputs: [{ name: 'flow_id', type: 'uint256' }], outputs: [{ type: 'string' }] },
   { type: 'function', name: 'get_accounting', stateMutability: 'view', inputs: [], outputs: [{ type: 'tuple' }] },
   { type: 'function', name: 'accept_flow', stateMutability: 'nonpayable', inputs: [{ name: 'flow_id', type: 'uint256' }], outputs: [] },
   { type: 'function', name: 'review_active_step', stateMutability: 'nonpayable', inputs: [{ name: 'flow_id', type: 'uint256' }], outputs: [] },
