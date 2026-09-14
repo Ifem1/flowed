@@ -1,4 +1,4 @@
-# { "Depends": "py-genlayer:test" }
+# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 """Flowed: funded sequential semantic workflows for GenLayer Studionet (61999).
 
 The contract keeps the consensus surface deliberately scalar. Models classify only
@@ -30,7 +30,7 @@ def _now():
     return gl.message.timestamp
 
 class Flowed(gl.Contract):
-    flows: TreeMap[u256, dict]
+    flows: TreeMap[u256, str]
     next_flow_id: u256
     funded: u256
     released: u256
@@ -47,7 +47,7 @@ class Flowed(gl.Contract):
         self.bonds_returned = self.bonds_forfeited = 0
 
     def _flow(self, fid):
-        f = self.flows[fid]
+        f = json.loads(self.flows[fid])
         assert f["state"] in STATES
         return f
 
@@ -78,18 +78,18 @@ class Flowed(gl.Contract):
         steps, total = self._steps(steps_json)
         assert total == escrow_amount == gl.message.value
         fid = self.next_flow_id; self.next_flow_id += 1
-        self.flows[fid] = {"payer": gl.message.sender, "recipient": recipient, "title": title,
+        self.flows[fid] = json.dumps({"payer": str(gl.message.sender), "recipient": str(recipient), "title": title,
           "summary": summary, "state": "OFFERED", "accept_by": accept_by,
           "contest_window": contest_window_seconds, "escrow": escrow_amount, "released": 0,
           "refunded": 0, "remaining": escrow_amount, "active": 0, "steps": steps,
-          "manifests": [], "contest_bond": 0}
+          "manifests": [], "contest_bond": 0})
         self.funded += escrow_amount
 
     @gl.public.write
     def accept_flow(self, flow_id: u256):
         f = self._flow(flow_id); assert f["state"] == "OFFERED" and gl.message.sender == f["recipient"] and _now() <= f["accept_by"]
         f["state"] = "ACTIVE"; f["steps"][0]["activated_at"] = _now(); f["steps"][0]["deadline"] = _now() + f["steps"][0]["ttl_seconds"]
-        self.flows[flow_id] = f
+        self.flows[flow_id] = json.dumps(f)
 
     @gl.public.write
     def decline_flow(self, flow_id: u256): self._refund_offer(flow_id, "DECLINED", True)
@@ -101,7 +101,7 @@ class Flowed(gl.Contract):
 
     def _refund_offer(self, fid, state, recipient_ok):
         f = self._flow(fid); assert f["state"] == "OFFERED" and (gl.message.sender == f["payer"] or (recipient_ok and gl.message.sender == f["recipient"]) or state == "EXPIRED")
-        self._send(f["payer"], f["remaining"]); self.refunded += f["remaining"]; f["refunded"] = f["remaining"]; f["remaining"] = 0; f["state"] = state; self.flows[fid] = f
+        self._send(f["payer"], f["remaining"]); self.refunded += f["remaining"]; f["refunded"] = f["remaining"]; f["remaining"] = 0; f["state"] = state; self.flows[fid] = json.dumps(f)
 
     def _send(self, to, amount):
         assert amount > 0; gl.transfer(to, amount)
@@ -135,13 +135,13 @@ class Flowed(gl.Contract):
         snapshot, digest = self._snapshot(f, s); result = self._classify(s["criteria"], snapshot)
         f["manifests"].append({"step": f["active"], "label": result, "digest": digest, "at": _now()}); s["last_label"] = result; s["snapshot_digest"] = digest
         if result == "SATISFIED": f["state"] = "PROVISIONAL"; f["contest_deadline"] = _now() + f["contest_window"]; s["snapshot"] = snapshot
-        self.flows[flow_id] = f
+        self.flows[flow_id] = json.dumps(f)
 
     @gl.public.write.payable
     def contest_active_step(self, flow_id: u256):
         f = self._flow(flow_id); assert f["state"] == "PROVISIONAL" and gl.message.sender == f["payer"] and _now() < f["contest_deadline"]
         bond = f["steps"][f["active"]]["amount_wei"] // 20; assert gl.message.value == bond
-        f["state"] = "CONTESTED"; f["contest_bond"] = bond; self.bonds_received += bond; self.bonds_locked += bond; self.flows[flow_id] = f
+        f["state"] = "CONTESTED"; f["contest_bond"] = bond; self.bonds_received += bond; self.bonds_locked += bond; self.flows[flow_id] = json.dumps(f)
 
     @gl.public.write
     def finalize_active_step(self, flow_id: u256):
@@ -154,14 +154,14 @@ class Flowed(gl.Contract):
         assert result in ("SATISFIED", "NOT_SATISFIED")
         self.bonds_locked -= f["contest_bond"]
         if result == "SATISFIED": self.bonds_forfeited += f["contest_bond"]; self._release(f, flow_id)
-        else: self.bonds_returned += f["contest_bond"]; self._send(f["payer"], f["contest_bond"]); f["state"] = "ACTIVE"; f["contest_bond"] = 0; self.flows[flow_id] = f
+        else: self.bonds_returned += f["contest_bond"]; self._send(f["payer"], f["contest_bond"]); f["state"] = "ACTIVE"; f["contest_bond"] = 0; self.flows[flow_id] = json.dumps(f)
 
     def _release(self, f, fid):
         amount = f["steps"][f["active"]]["amount_wei"]; self._send(f["recipient"], amount); self.released += amount; f["released"] += amount; f["remaining"] -= amount
         f["active"] += 1; f["contest_bond"] = 0
         if f["active"] >= len(f["steps"]): f["state"] = "COMPLETED"
         else: f["state"] = "ACTIVE"; f["steps"][f["active"]]["activated_at"] = _now(); f["steps"][f["active"]]["deadline"] = _now() + f["steps"][f["active"]]["ttl_seconds"]
-        self.flows[fid] = f
+        self.flows[fid] = json.dumps(f)
 
     @gl.public.write
     def abandon_flow(self, flow_id: u256):
@@ -172,9 +172,9 @@ class Flowed(gl.Contract):
         f = self._flow(flow_id); assert f["state"] == "ACTIVE" and _now() > f["steps"][f["active"]]["deadline"]; self._refund_remaining(f, flow_id, "EXPIRED")
 
     def _refund_remaining(self, f, fid, state):
-        self._send(f["payer"], f["remaining"]); self.refunded += f["remaining"]; f["refunded"] += f["remaining"]; f["remaining"] = 0; f["state"] = state; self.flows[fid] = f
+        self._send(f["payer"], f["remaining"]); self.refunded += f["remaining"]; f["refunded"] += f["remaining"]; f["remaining"] = 0; f["state"] = state; self.flows[fid] = json.dumps(f)
 
     @gl.public.view
-    def get_flow(self, flow_id: u256) -> dict: return self.flows[flow_id]
+    def get_flow(self, flow_id: u256) -> str: return self.flows[flow_id]
     @gl.public.view
     def get_accounting(self) -> dict: return {"funded": self.funded, "released": self.released, "refunded": self.refunded, "remaining": self.funded - self.released - self.refunded, "bonds_received": self.bonds_received, "bonds_locked": self.bonds_locked, "bonds_returned": self.bonds_returned, "bonds_forfeited": self.bonds_forfeited}
