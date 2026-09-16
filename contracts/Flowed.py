@@ -1,10 +1,10 @@
-# { "Depends": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng" }
+# v0.2.16
+# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 """Flowed: funded sequential semantic workflows for GenLayer Studionet (61999).
 
 The contract keeps the consensus surface deliberately scalar. Models classify only
 the frozen active-step snapshot; every monetary transition below is deterministic.
 """
-import genlayer as gl
 from genlayer import *
 import hashlib, json, re, datetime
 
