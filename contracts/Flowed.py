@@ -1,15 +1,17 @@
-# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
+# v0.3.0
+# { "Depends": "py-genlayer:9b8kjyda2ycxyq4ea6g4yfpnydxhd52gqba5rb8dw7krkh5mn9p0" }
 """Flowed: funded sequential semantic workflows for GenLayer Studionet (61999).
 
 Flowed turns funded work into a sequential semantic state machine: when GenLayer
 establishes that the active step is complete, deterministic contract logic releases
 its precommitted tranche and activates the next step.
 """
-from genlayer import *
 import hashlib
 import json
 import re
 import datetime
+import genlayer as gl
+from genlayer.types import *
 
 MIN_STEPS, MAX_STEPS = 2, 8
 MIN_TTL, MAX_TTL = 300, 30 * 24 * 60 * 60
@@ -36,10 +38,10 @@ def _valid_url(url: str) -> bool:
 
 
 def _now() -> int:
-    return int(datetime.datetime.fromisoformat(gl.message_raw["datetime"].replace("Z", "+00:00")).timestamp())
+    return int(datetime.datetime.fromisoformat(gl.message.raw["datetime"].replace("Z", "+00:00")).timestamp())
 
 
-class Flowed(gl.Contract):
+class Flowed(gl.contract.Contract):
     flows: TreeMap[u256, str]
     next_flow_id: u256
     funded: u256
@@ -185,7 +187,7 @@ class Flowed(gl.Contract):
 
     def _send(self, to, amount):
         assert amount > 0
-        gl.get_contract_at(Address(to)).emit_transfer(value=u256(amount), on="finalized")
+        gl.contract.get_at(Address(to)).emit_transfer(value=u256(amount))
 
     def _snapshot(self, step):
         def fetch():
@@ -217,14 +219,7 @@ class Flowed(gl.Contract):
         def classify():
             out = gl.nondet.exec_prompt(prompt)
             return out if isinstance(out, str) and out in LABELS else "MODEL_OUTPUT_INVALID"
-        def validator(leader_result):
-            try:
-                if not isinstance(leader_result, gl.vm.Return):
-                    return False
-                return isinstance(leader_result.calldata, str) and classify() == leader_result.calldata
-            except Exception:
-                return False
-        return gl.vm.run_nondet_unsafe(classify, validator)
+        return gl.eq_principle.strict_eq(classify)
 
     @gl.public.write
     def review_active_step(self, flow_id: u256):
