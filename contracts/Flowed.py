@@ -10,6 +10,7 @@ import hashlib
 import json
 import re
 import datetime
+from genlayer.storage import TreeMap
 import genlayer as gl
 from genlayer.types import *
 
