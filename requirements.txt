@@ -1,3 +1,4 @@
-genlayer-test[sim]==0.29.2
-genvm-linter==0.6.3
+genlayer-py @ git+https://github.com/genlayerlabs/genlayer-py@dd25ef7f43e99a14b8fe42a64e01374845ad4d2d
+genlayer-test[sim] @ git+https://github.com/genlayerlabs/genlayer-testing-suite@343e3a358f9e235a93b49c60721ce7676585ff07
+genvm-linter @ git+https://github.com/genlayerlabs/genvm-linter@28450e665666300fc648dbe495110dfd0cb6a7b4
 pytest==9.1.1
