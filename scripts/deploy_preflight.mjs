@@ -9,9 +9,10 @@ const text = source.toString('utf8');
 const sha256 = createHash('sha256').update(source).digest('hex');
 const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 
-if (!text.includes('class Flowed(gl.Contract)')) throw new Error('Production Flowed contract class not found');
+if (!text.includes('class Flowed(gl.contract.Contract)')) throw new Error('Production Flowed contract class not found');
 if (!/def __init__\(self\):/.test(text)) throw new Error('Flowed must deploy without constructor arguments');
-if (!text.includes('py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6')) throw new Error('Unexpected production SDK dependency');
+if (!text.includes('# v0.3.0')) throw new Error('Flowed must target the GenVM v0.3 contract layout');
+if (!text.includes('py-genlayer:9b8kjyda2ycxyq4ea6g4yfpnydxhd52gqba5rb8dw7krkh5mn9p0')) throw new Error('Unexpected production SDK dependency');
 
 async function rpc(method, params = []) {
   const response = await fetch(RPC, {
@@ -42,6 +43,7 @@ console.log(JSON.stringify({
   chainId: Number(chainId),
   rpc: RPC,
   contract: 'contracts/Flowed.py',
+  genvmLayout: 'v0.3.0',
   constructorArgs: [],
   sourceCommit: head,
   sourceSha256: sha256,
