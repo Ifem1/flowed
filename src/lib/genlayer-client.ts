@@ -1,6 +1,7 @@
 import { createClient } from 'genlayer-js';
 import { studionet } from 'genlayer-js/chains';
 import { ExecutionResult, TransactionStatus, TransactionHashVariant } from 'genlayer-js/types';
+import type { CalldataEncodable, Hash } from 'genlayer-js/types';
 import type { Address } from 'viem';
 import type { CreateFlowPayload } from './protocol';
 
@@ -45,10 +46,9 @@ export async function getAccounting(client: ReturnType<typeof createReadClient>,
 }
 
 type WalletClient = ReturnType<typeof createWalletClient>;
-type TxHash = `0x${string}`;
 
-async function write(client: WalletClient, address: Address, functionName: string, args: unknown[], value = 0n): Promise<TxHash> {
-  return client.writeContract({ address, functionName, args, value }) as Promise<TxHash>;
+async function write(client: WalletClient, address: Address, functionName: string, args: CalldataEncodable[], value = 0n): Promise<Hash> {
+  return client.writeContract({ address, functionName, args, value });
 }
 
 export function createFlow(client: WalletClient, address: Address, payload: CreateFlowPayload) {
@@ -66,7 +66,7 @@ export function finalizeStalledContest(client: WalletClient, address: Address, f
 export function abandonFlow(client: WalletClient, address: Address, flowId: bigint) { return write(client, address, 'abandon_flow', [flowId]); }
 export function expireActiveFlow(client: WalletClient, address: Address, flowId: bigint) { return write(client, address, 'expire_active_flow', [flowId]); }
 
-export async function waitForFinalizedSuccess(client: ReturnType<typeof createReadClient>, hash: TxHash) {
+export async function waitForFinalizedSuccess(client: ReturnType<typeof createReadClient>, hash: Hash) {
   const receipt = await client.waitForTransactionReceipt({ hash, status: TransactionStatus.FINALIZED, fullTransaction: false });
   if (receipt.txExecutionResultName !== ExecutionResult.FINISHED_WITH_RETURN) {
     throw new Error(`GenLayer transaction finalized without success: ${String(receipt.txExecutionResultName)}`);
