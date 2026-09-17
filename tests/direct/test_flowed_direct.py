@@ -1,6 +1,9 @@
 """Genuine Direct Mode tests: execute contracts/Flowed.py in-memory via genlayer-test."""
 import json
 
+import pytest
+from gltest.direct import create_address
+
 CONTRACT = "contracts/Flowed.py"
 SDK_VERSION = "v0.6.0-rc5"
 BASE_TIME = "2026-09-17T20:00:00Z"
@@ -10,6 +13,10 @@ STEP = 10**16  # 0.01 GEN
 
 def deploy(direct_deploy):
     return direct_deploy(CONTRACT, sdk_version=SDK_VERSION)
+
+
+def addresses():
+    return create_address("alice"), create_address("bob")
 
 
 def steps_json():
@@ -62,7 +69,8 @@ def test_constructor_and_global_accounting(direct_vm, direct_deploy):
 def test_create_uses_frontend_payload_shape_and_exact_funding(direct_vm, direct_deploy, direct_alice, direct_bob):
     direct_vm.warp(BASE_TIME)
     contract = deploy(direct_deploy)
-    create(contract, direct_vm, direct_alice, direct_bob)
+    alice, bob = addresses()
+    create(contract, direct_vm, alice, bob)
     f = flow(contract)
     assert f["state"] == "OFFERED"
     assert f["escrow"] == STEP * 2
@@ -74,8 +82,9 @@ def test_create_uses_frontend_payload_shape_and_exact_funding(direct_vm, direct_
 def test_accept_activates_only_step_one(direct_vm, direct_deploy, direct_alice, direct_bob):
     direct_vm.warp(BASE_TIME)
     contract = deploy(direct_deploy)
-    create(contract, direct_vm, direct_alice, direct_bob)
-    direct_vm.sender = direct_bob
+    alice, bob = addresses()
+    create(contract, direct_vm, alice, bob)
+    direct_vm.sender = bob
     contract.accept_flow(1)
     f = flow(contract)
     assert f["state"] == "ACTIVE"
@@ -89,8 +98,9 @@ def test_accept_activates_only_step_one(direct_vm, direct_deploy, direct_alice, 
 def test_withdraw_refunds_exactly_and_cannot_replay(direct_vm, direct_deploy, direct_alice, direct_bob):
     direct_vm.warp(BASE_TIME)
     contract = deploy(direct_deploy)
-    create(contract, direct_vm, direct_alice, direct_bob)
-    direct_vm.sender = direct_alice
+    alice, bob = addresses()
+    create(contract, direct_vm, alice, bob)
+    direct_vm.sender = alice
     contract.withdraw_offer(1)
     f = flow(contract)
     assert f["state"] == "WITHDRAWN"
@@ -98,16 +108,17 @@ def test_withdraw_refunds_exactly_and_cannot_replay(direct_vm, direct_deploy, di
     accounting = contract.get_accounting()
     assert accounting["funded"] == accounting["refunded"] == STEP * 2
     assert accounting["remaining"] == 0
-    with direct_vm.expect_revert():
+    with pytest.raises(AssertionError):
         contract.withdraw_offer(1)
 
 
 def test_decline_on_second_flow_preserves_global_and_per_flow_invariants(direct_vm, direct_deploy, direct_alice, direct_bob):
     direct_vm.warp(BASE_TIME)
     contract = deploy(direct_deploy)
-    create(contract, direct_vm, direct_alice, direct_bob, "Flow one")
-    create(contract, direct_vm, direct_alice, direct_bob, "Flow two")
-    direct_vm.sender = direct_bob
+    alice, bob = addresses()
+    create(contract, direct_vm, alice, bob, "Flow one")
+    create(contract, direct_vm, alice, bob, "Flow two")
+    direct_vm.sender = bob
     contract.decline_flow(2)
     f1, f2 = flow(contract, 1), flow(contract, 2)
     assert f1["escrow"] == f1["released"] + f1["refunded"] + f1["remaining"]
@@ -119,8 +130,9 @@ def test_decline_on_second_flow_preserves_global_and_per_flow_invariants(direct_
 def test_satisfied_review_uses_frozen_snapshot_and_becomes_provisional(direct_vm, direct_deploy, direct_alice, direct_bob):
     direct_vm.warp(BASE_TIME)
     contract = deploy(direct_deploy)
-    create(contract, direct_vm, direct_alice, direct_bob)
-    direct_vm.sender = direct_bob
+    alice, bob = addresses()
+    create(contract, direct_vm, alice, bob)
+    direct_vm.sender = bob
     contract.accept_flow(1)
     direct_vm.mock_web(r"example\.com/step-1", {"status": 200, "body": "Architecture is delivered."})
     direct_vm.mock_llm(r"frozen acceptance criteria", "SATISFIED")
