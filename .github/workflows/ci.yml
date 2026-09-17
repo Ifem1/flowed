@@ -40,6 +40,16 @@ jobs:
       - name: Execute actual Flowed.py in Direct Mode
         run: python -m pytest tests/direct -q
 
+  deployment-preflight:
+    name: studionet-deployment-preflight
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 20}
+      - name: Verify canonical source and Studionet chain
+        run: node scripts/deploy_preflight.mjs
+
   frontend:
     name: frontend
     runs-on: ubuntu-24.04
