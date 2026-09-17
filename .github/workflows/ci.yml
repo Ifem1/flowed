@@ -42,7 +42,10 @@ jobs:
           mkdir -p "$HOME/.cache/gltest-direct"
           curl --fail --location --retry 3 \
             https://github.com/genlayerlabs/genvm-manager/releases/download/v0.6.0-rc5/genvm-universal.tar.xz \
-            --output "$HOME/.cache/gltest-direct/genvm-universal-v0.6.0-rc5.tar.xz"
+            --output "$RUNNER_TEMP/genvm-universal-v0.6.0-rc5.tar.xz"
+          python scripts/adapt_genvm_bundle.py \
+            "$RUNNER_TEMP/genvm-universal-v0.6.0-rc5.tar.xz" \
+            "$HOME/.cache/gltest-direct/genvm-universal-v0.6.0-rc5.tar.xz"
       - name: Execute actual Flowed.py in Direct Mode
         run: python -m pytest tests/direct -q
 
