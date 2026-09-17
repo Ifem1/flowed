@@ -37,6 +37,12 @@ jobs:
         with: {python-version: '3.12'}
       - name: Install pinned GenLayer Direct Mode
         run: python -m pip install -r requirements.txt
+      - name: Cache official GenVM manager runner bundle for gltest
+        run: |
+          mkdir -p "$HOME/.cache/gltest-direct"
+          curl --fail --location --retry 3 \
+            https://github.com/genlayerlabs/genvm-manager/releases/download/v0.6.0-rc5/genvm-universal.tar.xz \
+            --output "$HOME/.cache/gltest-direct/genvm-universal-v0.6.0-rc5.tar.xz"
       - name: Execute actual Flowed.py in Direct Mode
         run: python -m pytest tests/direct -q
 
