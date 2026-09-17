@@ -3,40 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Flowed — funded workflows where work moves and money follows." />
+  <meta name="description" content="Flowed — funded sequential semantic workflows. Work moves. Money follows." />
   <title>Flowed · Work moves. Money follows.</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23121b2b'/%3E%3Cpath d='M8 17h10l-3-3m3 3-3 3M24 15H14l3-3m-3 3 3 3' fill='none' stroke='%2357e6bd' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23121b2b'/%3E%3Cpath d='M7 10h8v6h10M7 22h8v-6' fill='none' stroke='%235eead4' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="shell">
     <aside class="sidebar">
-      <a class="brand" href="#"><span class="brand-mark">↔</span><span>flowed</span></a>
+      <a class="brand" href="#overview"><span class="brand-mark">↝</span><span>flowed</span></a>
       <div class="network"><span class="pulse"></span> Studionet <b>61999</b></div>
       <nav>
         <button class="nav-item active" data-view="overview"><span>◈</span> Overview</button>
-        <button class="nav-item" data-view="flows"><span>▤</span> My flows <em>3</em></button>
+        <button class="nav-item" data-view="flows"><span>▤</span> All flows</button>
+        <button class="nav-item" data-view="dashboard"><span>◎</span> Dashboard</button>
         <button class="nav-item" data-view="create"><span>＋</span> Create a flow</button>
       </nav>
-      <div class="sidebar-foot"><div class="wallet-chip"><span class="avatar">Y</span><div><strong>Demo wallet</strong><small>0x71…A92C</small></div><span class="dot"></span></div><button class="ghost-btn" id="connect">Connect wallet</button></div>
+      <div class="sidebar-foot">
+        <div class="wallet-chip"><span class="avatar">●</span><div><strong id="wallet-label">Read-only</strong><small id="wallet-address">Public reads enabled</small></div><span class="dot"></span></div>
+        <button class="ghost-btn" id="connect">Connect wallet</button>
+      </div>
     </aside>
     <main>
-      <header class="topbar"><div class="mobile-brand">↔ flowed</div><div class="crumb">Workspace / <strong id="page-title">Overview</strong></div><button class="top-connect" id="top-connect">Connect wallet</button></header>
+      <header class="topbar">
+        <div class="mobile-brand">↝ flowed</div>
+        <div class="crumb">Flowed / <strong id="page-title">Overview</strong></div>
+        <div class="top-actions"><span id="chain-state" class="network-pill">Studionet 61999</span><button class="top-connect" id="top-connect">Connect wallet</button></div>
+      </header>
       <div class="content">
+        <div id="deployment-banner" class="panel notice" hidden></div>
         <section id="overview-view" class="view active-view">
-          <div class="welcome"><div><p class="eyebrow">MONDAY, SEPTEMBER 14, 2026</p><h1>Good morning, Yemi.</h1><p class="lede">Keep work moving through its next clear state.</p></div><button class="primary" data-view="create">Create a flow <span>↗</span></button></div>
-          <div class="stats"><div class="stat-card"><span>IN ESCROW</span><strong>0.03 <small>GEN</small></strong><i class="trend up">+12.4%</i></div><div class="stat-card"><span>RELEASED</span><strong>0.08 <small>GEN</small></strong><i class="trend">Across 8 steps</i></div><div class="stat-card"><span>ACTIVE FLOWS</span><strong>3</strong><i class="trend">2 as recipient</i></div></div>
-          <div class="section-head"><div><p class="eyebrow">LIVE WORK</p><h2>Flows in motion</h2></div><button class="text-btn" data-view="flows">View all flows →</button></div>
-          <div class="flow-grid" id="flow-grid"></div>
-          <div class="split"><div class="panel activity"><div class="panel-head"><h3>Recent activity</h3><button class="icon-btn">•••</button></div><div class="activity-row"><span class="activity-icon mint">✓</span><div><strong>Step released</strong><p>Brand system · 0.01 GEN</p></div><time>12m ago</time></div><div class="activity-row"><span class="activity-icon amber">!</span><div><strong>Contest window open</strong><p>Frontend live · Flow #014</p></div><time>48m ago</time></div><div class="activity-row"><span class="activity-icon blue">↗</span><div><strong>Flow accepted</strong><p>Analytics dashboard · Flow #013</p></div><time>2h ago</time></div></div><div class="panel principle"><div class="principle-kicker">THE FLOWED PRINCIPLE</div><blockquote>“AI verifies progression.<br /><em>The contract moves the money.</em>”</blockquote><div class="principle-line"></div><p>Every payment is frozen before work begins. Each step can only move forward when its evidence is reviewed.</p></div></div>
+          <div class="welcome"><div><p class="eyebrow">FUNDED SEQUENTIAL SEMANTIC WORKFLOWS</p><h1>Work moves. Money follows.</h1><p class="lede">A payer funds the complete workflow. GenLayer judges only whether the active step satisfies its frozen criteria; deterministic contract logic releases the precommitted tranche and activates the next step.</p></div><button class="primary" data-view="create">Create a flow <span>↗</span></button></div>
+          <div class="stats" id="global-stats"><div class="stat-card"><span>FUNDED</span><strong>—</strong></div><div class="stat-card"><span>RELEASED</span><strong>—</strong></div><div class="stat-card"><span>REMAINING</span><strong>—</strong></div><div class="stat-card"><span>FLOWS</span><strong>—</strong></div></div>
+          <div class="section-head"><div><p class="eyebrow">ON-CHAIN</p><h2>Flows in motion</h2></div><button class="text-btn" data-view="flows">View all →</button></div>
+          <div class="flow-grid" id="flow-grid"><div class="panel empty">Loading contract state…</div></div>
+          <div class="panel principle"><div class="principle-kicker">THE FLOWED PRINCIPLE</div><blockquote>“GenLayer verifies progression. <em>The contract moves the money.</em>”</blockquote><p>Payment amount, recipient, ordering, active step, and refunds are deterministic and frozen outside model control.</p></div>
         </section>
-        <section id="flows-view" class="view"><div class="page-heading"><div><p class="eyebrow">YOUR WORKSPACE</p><h1>My flows</h1><p class="lede">Every funded sequence, in one place.</p></div><button class="primary" data-view="create">＋ New flow</button></div><div class="filter-row"><button class="filter active">All <b>3</b></button><button class="filter">Paying <b>1</b></button><button class="filter">Receiving <b>2</b></button><span class="filter-spacer"></span><button class="ghost-btn">⌕ Search flows</button></div><div class="list" id="flow-list"></div></section>
-        <section id="detail-view" class="view"><button class="back text-btn" data-view="overview">← Back to overview</button><div id="detail-content"></div></section>
-        <section id="create-view" class="view"><button class="back text-btn" data-view="overview">← Back to overview</button><div class="create-layout"><div><p class="eyebrow">NEW WORKFLOW</p><h1>Fund the next<br /><span>clear step.</span></h1><p class="lede">Define the work, freeze the terms, and let progress release the money.</p><div class="create-steps"><div class="create-step active"><b>01</b><span>Flow details</span></div><div class="create-step"><b>02</b><span>Work steps</span></div><div class="create-step"><b>03</b><span>Review & fund</span></div></div></div><form class="form-card" id="flow-form"><label>Flow title<input required value="Launch analytics dashboard" /></label><label>Recipient wallet<input required placeholder="0x… recipient address" /></label><label>Summary<textarea required>Ship the production dashboard and complete the handover.</textarea></label><div class="form-row"><label>Accept by<input type="date" required value="2026-09-21" /></label><label>Contest window<select><option>24 hours</option><option>48 hours</option><option>7 days</option></select></label></div><div class="form-footer"><span>Step 1 of 3 · 0.01 GEN</span><button class="primary" type="submit">Continue to steps <span>→</span></button></div></form></div></section>
+
+        <section id="flows-view" class="view">
+          <div class="page-heading"><div><p class="eyebrow">PUBLIC READS</p><h1>All flows</h1><p class="lede">Real finalized state from the canonical Flowed contract. Wallet connection is not required.</p></div><button class="primary" data-view="create">＋ New flow</button></div>
+          <div class="list" id="flow-list"></div>
+        </section>
+
+        <section id="dashboard-view" class="view">
+          <div class="page-heading"><div><p class="eyebrow">PARTICIPANT VIEW</p><h1>Dashboard</h1><p class="lede">Flows where the connected wallet is payer or recipient.</p></div><button class="top-connect" id="dashboard-connect">Connect wallet</button></div>
+          <div class="split"><div class="panel"><h3>Flows I pay</h3><div id="payer-flows" class="list"></div></div><div class="panel"><h3>Flows I receive</h3><div id="recipient-flows" class="list"></div></div></div>
+        </section>
+
+        <section id="detail-view" class="view">
+          <button class="back text-btn" data-view="flows">← Back to flows</button>
+          <div id="detail-content"></div>
+        </section>
+
+        <section id="create-view" class="view">
+          <button class="back text-btn" data-view="overview">← Back</button>
+          <div class="page-heading"><div><p class="eyebrow">NEW FUNDED WORKFLOW</p><h1>Create a Flow</h1><p class="lede">Freeze 2–8 ordered steps, their exact tranches, criteria, evidence, and timing before funding.</p></div></div>
+          <form class="form-card wide-form" id="flow-form">
+            <div class="form-row"><label>Flow title<input id="flow-title" required maxlength="140" placeholder="Launch analytics dashboard" /></label><label>Recipient wallet<input id="recipient" required pattern="0x[a-fA-F0-9]{40}" placeholder="0x…" /></label></div>
+            <label>Summary<textarea id="summary" maxlength="2400" placeholder="What this funded workflow delivers"></textarea></label>
+            <div class="form-row"><label>Accept by<input id="accept-by" type="datetime-local" required /></label><label>Contest window (seconds)<input id="contest-window" type="number" min="60" max="604800" step="1" value="3600" required /></label></div>
+            <div class="section-head"><div><p class="eyebrow">ORDERED STEPS</p><h2>Frozen work sequence</h2></div><button type="button" id="add-step" class="ghost-btn">＋ Add step</button></div>
+            <div id="step-editor"></div>
+            <div class="panel review-box"><div><span>Total escrow</span><strong id="create-total">0 GEN</strong></div><p>Contest bond per provisional step is exactly 5% of that step’s frozen amount.</p></div>
+            <div class="form-footer"><span id="create-note">Wallet required only when funding.</span><button class="primary" type="submit">Fund Flow <span>→</span></button></div>
+          </form>
+        </section>
       </div>
     </main>
   </div>
+  <div class="tx-panel" id="tx-panel" hidden><strong id="tx-stage">Awaiting signature</strong><small id="tx-detail"></small></div>
   <div class="toast" id="toast"></div>
-  <script src="app.js"></script>
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
