@@ -1,5 +1,5 @@
 # v0.3.0
-# { "Depends": "py-genlayer:9b8kjyda2ycxyq4ea6g4yfpnydxhd52gqba5rb8dw7krkh5mn9p0" }
+# { "Depends": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng" }
 """Flowed: funded sequential semantic workflows for GenLayer Studionet (61999).
 
 Flowed turns funded work into a sequential semantic state machine: when GenLayer
@@ -198,11 +198,11 @@ class Flowed(gl.contract.Contract):
                     response = gl.nondet.web.get(src["url"])
                     status = getattr(response, "status_code", getattr(response, "status", None))
                     if status is None or status < 200 or status >= 300:
-                        raise Exception("unusable source status")
+                        raise gl.vm.UserError("unusable source status")
                     body = response.body.decode("utf-8", errors="replace") if isinstance(response.body, bytes) else str(response.body)
                     body = body.strip()
                     if not body:
-                        raise Exception("empty source")
+                        raise gl.vm.UserError("empty source")
                     out.append({"label": src["label"], "url": src["url"], "required": src["required"], "body": body[:MAX_SOURCE_BODY]})
                 except Exception:
                     if src["required"]:

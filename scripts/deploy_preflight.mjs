@@ -12,7 +12,7 @@ const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).tr
 if (!text.includes('class Flowed(gl.contract.Contract)')) throw new Error('Production Flowed contract class not found');
 if (!/def __init__\(self\):/.test(text)) throw new Error('Flowed must deploy without constructor arguments');
 if (!text.includes('# v0.3.0')) throw new Error('Flowed must target the GenVM v0.3 contract layout');
-if (!text.includes('py-genlayer:9b8kjyda2ycxyq4ea6g4yfpnydxhd52gqba5rb8dw7krkh5mn9p0')) throw new Error('Unexpected production SDK dependency');
+if (!text.includes('py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng')) throw new Error('Unexpected production SDK dependency');
 
 async function rpc(method, params = []) {
   const response = await fetch(RPC, {
@@ -43,7 +43,7 @@ console.log(JSON.stringify({
   chainId: Number(chainId),
   rpc: RPC,
   contract: 'contracts/Flowed.py',
-  genvmLayout: 'v0.3.0',
+  genvmLayout: 'v0.6.0-rc5 / v0.3.0 SDK',
   constructorArgs: [],
   sourceCommit: head,
   sourceSha256: sha256,
