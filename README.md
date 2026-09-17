@@ -2,18 +2,65 @@
 
 **Work moves. Money follows.**
 
-Flowed is a funded semantic workflow protocol: a payer freezes a sequence of work steps, acceptance criteria, evidence sources, timing, and tranche amounts. GenLayer reviews only the active step against a frozen evidence snapshot; deterministic contract logic moves the precommitted money.
+Flowed is a funded sequential semantic workflow. One payer funds an entire 2–8 step workflow upfront. Each ordered step freezes its exact tranche, acceptance criteria, evidence sources, and relative deadline. GenLayer judges only whether the current active step satisfies its frozen criteria against a frozen public-evidence snapshot; deterministic contract logic releases the precommitted tranche and activates the next step.
 
-## Current build
+> “Flowed turns funded work into a sequential semantic state machine: when GenLayer establishes that the active step is complete, deterministic contract logic releases its precommitted tranche and activates the next step.”
 
-This repository contains the Flowed contract, protocol tests, exact-money utilities, TypeScript protocol boundary, responsive product surface, deployment runner, and reviewer documentation. The contract targets GenLayer Studionet (chain ID **61999**) and does not claim a live contract, deployment, or fake transaction success.
+## Network
 
-Open `index.html` in a browser to inspect the experience. The demo data is clearly presentational and is not a substitute for contract reads.
+- GenLayer Studionet only
+- Chain ID: `61999`
+- RPC: `https://studio.genlayer.com/api`
+- Explorer: `https://explorer-studio.genlayer.com`
+- Production contract source: `contracts/Flowed.py`
 
-## Product boundary
+## What is implemented
 
-The production implementation should use one contract, `contracts/Flowed.py`, with 2–8 ordered steps, exact 18-decimal GEN accounting, scalar `SATISFIED` / `NOT_SATISFIED` / `INCONCLUSIVE` consensus, frozen evidence, bounded contests, permissionless finalization, and no admin settlement.
+- complete Flow lifecycle: create, accept, decline, withdraw, offer expiry, active review/retry, contest, contest resolution, provisional finalization, stalled-contest fallback, abandonment, and active expiry
+- exact global and per-Flow escrow/bond accounting
+- canonical bounded equality-backed evidence snapshots with SHA-256 digests
+- contest reuse of the stored primary snapshot without refetch or evidence injection
+- one-scalar semantic verdict boundary
+- finalized GEN transfers using the supported GenLayer contract transfer mechanism
+- genuine Linux Direct Mode executing the actual production `Flowed.py`
+- contract/protocol test suite and GenVM lint/SDK validation in GitHub Actions
+- live browser reads through `genlayer-js` without wallet connection
+- injected-wallet writes with Studionet enforcement and finalized receipt checking
+- exact `BigInt` GEN handling in frontend utilities and browser write construction
+- real flow list, detail, dashboard, create-flow, history/manifests, accounting, actions, and transaction lifecycle UI
 
-## Next integration gate
+The browser deliberately shows **deployment pending** while `config.js` has no canonical contract address. It never falls back to fake flows or fake transaction success.
 
-Install the pinned `genlayer-js` client in the deployment environment, bind `src/lib/protocol.ts` to its public reads and finalized wallet-gated writes, then run `node scripts/live_full.mjs` with secure `FLOWED_PRIVATE_KEY` and `FLOWED_CONTRACT_ADDRESS` values. Record the canonical address, source commit, transaction hashes, and live 3-step verification in `docs/LIVE_VERIFICATION.md`.
+## Development checks
+
+```bash
+python -m pip install -r requirements.txt
+python scripts/validate_contract.py
+genvm-lint check contracts/Flowed.py
+python -m pytest tests/contract tests/frontend -q
+python -m pytest tests/direct -q
+
+npm ci
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+CI separates contract static validation, contract/protocol tests, genuine Direct Mode, and frontend validation so unrelated gates do not become skipped merely because another gate fails.
+
+## Deployment
+
+Run the no-signature preflight first:
+
+```bash
+node scripts/deploy_preflight.mjs
+```
+
+The production deployment itself targets only Studionet `61999` and has no constructor arguments. See `docs/DEPLOYMENT.md`. Deployment is not claimed until a funded wallet actually signs it and the canonical address/transaction are recorded.
+
+## Live verification
+
+After deployment, the canonical address is wired into the frontend and the required tiny 3-step live Flow is executed. Only actual finalized artifacts belong in `docs/LIVE_VERIFICATION.md`; mocked Direct Mode model output is never described as live semantic proof.
+
+See `FLOWED_BUILD_SPEC.md`, `BUILD_STATUS.md`, `docs/ARCHITECTURE.md`, and `docs/SECURITY_MODEL.md` for the frozen protocol boundary.
