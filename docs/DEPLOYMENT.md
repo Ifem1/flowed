@@ -7,6 +7,7 @@
 - RPC: `https://studio.genlayer.com/api`
 - Explorer: `https://explorer-studio.genlayer.com`
 - Production source: `contracts/Flowed.py`
+- GenVM contract layout: `v0.3.0`
 - Constructor arguments: none
 - Constructor value: `0 GEN`
 
@@ -21,12 +22,6 @@ node scripts/deploy_preflight.mjs
 ```
 
 Optionally include the intended deployer so the preflight also reads its current RPC balance:
-
-```bash
-DEPL0YER_ADDRESS=0x... node scripts/deploy_preflight.mjs
-```
-
-Use the actual variable name `DEPLOYER_ADDRESS` (the spelling above is illustrative only):
 
 ```bash
 DEPLOYER_ADDRESS=0xYourAddress node scripts/deploy_preflight.mjs
