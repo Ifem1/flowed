@@ -2,9 +2,14 @@
 import json
 
 CONTRACT = "contracts/Flowed.py"
+SDK_VERSION = "v0.2.16"
 BASE_TIME = "2026-09-17T20:00:00Z"
 ACCEPT_BY = 1_800_000_000
 STEP = 10**16  # 0.01 GEN
+
+
+def deploy(direct_deploy):
+    return direct_deploy(CONTRACT, sdk_version=SDK_VERSION)
 
 
 def steps_json():
@@ -39,7 +44,7 @@ def flow(contract, flow_id=1):
 
 def test_constructor_and_global_accounting(direct_vm, direct_deploy):
     direct_vm.warp(BASE_TIME)
-    contract = direct_deploy(CONTRACT)
+    contract = deploy(direct_deploy)
     accounting = contract.get_accounting()
     assert accounting == {
         "funded": 0,
@@ -56,7 +61,7 @@ def test_constructor_and_global_accounting(direct_vm, direct_deploy):
 
 def test_create_uses_frontend_payload_shape_and_exact_funding(direct_vm, direct_deploy, direct_alice, direct_bob):
     direct_vm.warp(BASE_TIME)
-    contract = direct_deploy(CONTRACT)
+    contract = deploy(direct_deploy)
     create(contract, direct_vm, direct_alice, direct_bob)
     f = flow(contract)
     assert f["state"] == "OFFERED"
@@ -68,7 +73,7 @@ def test_create_uses_frontend_payload_shape_and_exact_funding(direct_vm, direct_
 
 def test_accept_activates_only_step_one(direct_vm, direct_deploy, direct_alice, direct_bob):
     direct_vm.warp(BASE_TIME)
-    contract = direct_deploy(CONTRACT)
+    contract = deploy(direct_deploy)
     create(contract, direct_vm, direct_alice, direct_bob)
     direct_vm.sender = direct_bob
     contract.accept_flow(1)
@@ -83,7 +88,7 @@ def test_accept_activates_only_step_one(direct_vm, direct_deploy, direct_alice, 
 
 def test_withdraw_refunds_exactly_and_cannot_replay(direct_vm, direct_deploy, direct_alice, direct_bob):
     direct_vm.warp(BASE_TIME)
-    contract = direct_deploy(CONTRACT)
+    contract = deploy(direct_deploy)
     create(contract, direct_vm, direct_alice, direct_bob)
     direct_vm.sender = direct_alice
     contract.withdraw_offer(1)
@@ -99,7 +104,7 @@ def test_withdraw_refunds_exactly_and_cannot_replay(direct_vm, direct_deploy, di
 
 def test_decline_on_second_flow_preserves_global_and_per_flow_invariants(direct_vm, direct_deploy, direct_alice, direct_bob):
     direct_vm.warp(BASE_TIME)
-    contract = direct_deploy(CONTRACT)
+    contract = deploy(direct_deploy)
     create(contract, direct_vm, direct_alice, direct_bob, "Flow one")
     create(contract, direct_vm, direct_alice, direct_bob, "Flow two")
     direct_vm.sender = direct_bob
@@ -113,7 +118,7 @@ def test_decline_on_second_flow_preserves_global_and_per_flow_invariants(direct_
 
 def test_satisfied_review_uses_frozen_snapshot_and_becomes_provisional(direct_vm, direct_deploy, direct_alice, direct_bob):
     direct_vm.warp(BASE_TIME)
-    contract = direct_deploy(CONTRACT)
+    contract = deploy(direct_deploy)
     create(contract, direct_vm, direct_alice, direct_bob)
     direct_vm.sender = direct_bob
     contract.accept_flow(1)
