@@ -1,4 +1,4 @@
-import { createClient } from 'genlayer-js';
+import { createClient, isSuccessful } from 'genlayer-js';
 import { studionet } from 'genlayer-js/chains';
 import { ExecutionResult, TransactionHashVariant, TransactionStatus } from 'genlayer-js/types';
 
@@ -31,10 +31,18 @@ const client = createClient({ chain: studionet });
 const deploymentReceipt = await client.waitForTransactionReceipt({
   hash: DEPLOYMENT_TX,
   status: TransactionStatus.FINALIZED,
+  fullTransaction: true,
 });
-if (deploymentReceipt.txExecutionResultName !== ExecutionResult.FINISHED_WITH_RETURN) {
+if (!isSuccessful(deploymentReceipt)) {
   throw new Error(
-    `Canonical deployment finalized without successful execution: ${deploymentReceipt.txExecutionResultName}`,
+    `Canonical deployment finalized without successful execution: ${JSON.stringify({
+      status: deploymentReceipt.status,
+      statusName: deploymentReceipt.statusName,
+      txExecutionResult: deploymentReceipt.txExecutionResult,
+      txExecutionResultName: deploymentReceipt.txExecutionResultName,
+      result: deploymentReceipt.result,
+      resultName: deploymentReceipt.resultName,
+    })}`,
   );
 }
 
@@ -72,7 +80,9 @@ console.log(
       deploymentTx: DEPLOYMENT_TX,
       deployment: {
         status: 'FINALIZED',
-        execution: deploymentReceipt.txExecutionResultName,
+        statusName: deploymentReceipt.statusName,
+        txExecutionResult: deploymentReceipt.txExecutionResult,
+        execution: deploymentReceipt.txExecutionResultName || ExecutionResult.FINISHED_WITH_RETURN,
       },
       flowCount: flowCount.toString(),
       accounting: a,
