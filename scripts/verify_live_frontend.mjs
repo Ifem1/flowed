@@ -92,7 +92,7 @@ if (!appCss.text.includes('#D95C32') || !appCss.text.includes('#9D3656') || !app
 if (!appCss.text.includes('var(--success)')) throw new Error('Operational app missing semantic success color treatment');
 
 if (!config.text.includes(CONTRACT)) throw new Error('Production config missing canonical Flowed contract');
-if (!config.text.includes('chainId: 61999')) throw new Error('Production config missing Studionet 61999');
+if (!/chainId[\"']?\s*[:=]\s*61999|\"chainId\":61999/.test(config.text)) throw new Error('Production config missing Studionet 61999');
 if (!config.text.includes('https://studio.genlayer.com/api')) throw new Error('Production config missing canonical RPC');
 
 for (const method of ['get_flow_count','get_flow','get_active_step','get_accounting']) {
