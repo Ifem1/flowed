@@ -1,5 +1,9 @@
-const BASE = 'https://raw.githack.com/Ifem1/flowed/d2016d4d2a164fc557caaaa83aafdd40bf68129b';
+const BASE = (process.env.FLOWED_LIVE_FRONTEND || '').replace(/\/$/, '');
 const CONTRACT = '0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad';
+
+if (!/^https:\/\//.test(BASE)) {
+  throw new Error('Set FLOWED_LIVE_FRONTEND to the deployed Vercel origin, e.g. https://flowed.vercel.app');
+}
 
 async function get(path) {
   const url = `${BASE}/${path}`;
@@ -30,12 +34,12 @@ if (!config.text.includes('https://studio.genlayer.com/api')) throw new Error('L
 for (const method of ['get_flow_count', 'get_flow', 'get_active_step', 'get_accounting']) {
   if (!app.text.includes(method)) throw new Error(`Live app missing public read ${method}`);
 }
-for (const method of ['create_flow','accept_flow','review_active_step','contest_active_step','resolve_contest','finalize_active_step']) {
+for (const method of ['create_flow','accept_flow','decline_flow','withdraw_offer','expire_unaccepted_flow','review_active_step','contest_active_step','resolve_contest','finalize_active_step','finalize_stalled_contest','abandon_flow','expire_active_flow']) {
   if (!app.text.includes(method)) throw new Error(`Live app missing write ${method}`);
 }
 if (!app.text.includes('wallet_switchEthereumChain')) throw new Error('Live app missing wrong-network switch handling');
 if (!app.text.includes('TransactionStatus.FINALIZED')) throw new Error('Live app missing finalized transaction handling');
-if (!app.text.includes("parseLosslessJson")) throw new Error('Live app missing lossless contract JSON parsing');
+if (!app.text.includes('parseLosslessJson')) throw new Error('Live app missing lossless contract JSON parsing');
 if (!lossless.text.includes('stringifyJsonIntegers')) throw new Error('Live lossless JSON module missing');
 if (app.text.includes('FLOWED_LIVE_FLOWS')) throw new Error('Live app contains forbidden mock flow source');
 if (/private\s*key|private_key|FLOWED_PRIVATE_KEY/i.test(app.text + index.text)) {
@@ -44,8 +48,7 @@ if (/private\s*key|private_key|FLOWED_PRIVATE_KEY/i.test(app.text + index.text))
 
 console.log(JSON.stringify({
   status: 'PASS',
-  liveFrontend: index.url,
-  sourceCommit: 'd2016d4d2a164fc557caaaa83aafdd40bf68129b',
+  liveFrontend: BASE,
   contract: CONTRACT,
   chainId: 61999,
   resources: {
@@ -56,7 +59,7 @@ console.log(JSON.stringify({
     losslessJson: lossless.contentType,
   },
   publicReads: 'PASS',
-  writeSurface: 'PASS',
+  fullWriteSurface: 'PASS',
   wrongNetworkHandling: 'PASS',
   finalizedHandlingPresent: 'PASS',
   losslessContractJson: 'PASS',
