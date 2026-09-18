@@ -1,70 +1,72 @@
 # Deployment
 
-## Canonical target
+## Canonical production deployment
+
+Flowed is already deployed. Do **not** redeploy or modify `contracts/Flowed.py`.
 
 - Network: **GenLayer Studionet**
 - Chain ID: **61999**
 - RPC: `https://studio.genlayer.com/api`
 - Explorer: `https://explorer-studio.genlayer.com`
-- Production source: `contracts/Flowed.py`
-- GenVM contract layout: `v0.2.16`
+- Canonical contract: `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`
+- Canonical deployed source commit: `c628a86951d59de4c774d89cb4c8ae5cbb1e4e47`
+- Source SHA-256: `0aac468a81efe683798271e0c38c6e582eeef515386bb8e4a1d8eed8defd72b4`
+- Git blob: `b8c351464cf876fedb1c1b0312670a1a4d693b5b`
+- Deployment transaction: `0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a`
+- Runtime: `v0.2.16`
 - Depends runner: `py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6`
 - Constructor arguments: none
 - Constructor value: `0 GEN`
 
-Do not use `61997`, `studio-dev`, or Bradbury for the canonical Flowed deployment.
+`scripts/deploy_preflight.mjs` now acts as a post-deployment source/chain guard. It fails if the local production source no longer matches the canonical deployed SHA-256/Git blob or if the configured RPC is not chain `61999`.
 
-## Preflight — no signature required
+`scripts/verify_canonical_live.mjs` independently verifies the canonical deployment transaction reaches `FINALIZED`, checks successful stable Studio leader execution, reads the canonical contract at `LATEST_FINAL`, and verifies the global accounting equations.
 
-Run:
+## Frontend production deployment
 
-```bash
-node scripts/deploy_preflight.mjs
-```
-
-Optionally include the intended deployer so the preflight also reads its current RPC balance:
+The static build is canonical by default:
 
 ```bash
-DEPLOYER_ADDRESS=0xYourAddress node scripts/deploy_preflight.mjs
+npm ci
+npm run lint
+npm run typecheck
+npm test
+npm run build
 ```
 
-The script fails if the RPC is not chain `61999`, the production class/SDK pin is unexpected, or the constructor is not zero-argument. It prints the exact Git commit and SHA-256 of `contracts/Flowed.py`.
+`scripts/build.mjs` rejects any configured production address other than `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`.
 
-## Canonical deployment
+A GitHub Pages production workflow is staged at `.github/workflows/pages.yml`. It is manual-only so repository commits are not marked failed while Pages is disabled. Before running it, an administrator must enable **Settings → Pages → Build and deployment → Source: GitHub Actions**. Once enabled, run the **Flowed Frontend Production** workflow and record its emitted `page_url`.
 
-Official CLI form:
+## Canonical live demo payload
 
-```bash
-genlayer deploy --contract contracts/Flowed.py --rpc https://studio.genlayer.com/api
-```
+Use exactly three steps and total escrow `0.03 GEN`:
 
-No `--args` are supplied because `Flowed.__init__` has no constructor arguments.
+- each tranche: `0.01 GEN` = `10000000000000000` wei
+- total: `0.03 GEN` = `30000000000000000` wei
+- step-2 contest bond: `0.0005 GEN` = `500000000000000` wei
+- contest window: `60` seconds
+- recommended step TTL: `3600` seconds
+- acceptance deadline: choose a future Unix timestamp when the payer signs
 
-Equivalent Studio UI flow:
+Frozen criteria and immutable sources:
 
-1. Open `https://studio.genlayer.com`.
-2. Confirm the environment is **Studionet (61999)**.
-3. Add `contracts/Flowed.py` from file and open it.
-4. Confirm Constructor Inputs is empty.
-5. Connect/select the funded deployer account.
-6. Click **Deploy** and approve the wallet transaction.
-7. Wait for finalized success and record the contract address and deployment transaction.
+1. criterion: `The evidence states that Flowed demo stage 1 is complete.`
+   source: `https://raw.githubusercontent.com/Ifem1/flowed/eb7cfea7fa192517186334a900dba33ee6a70dd9/demo-evidence/step-1.txt`
+2. criterion: `The evidence states that Flowed demo stage 2 is complete.`
+   source: `https://raw.githubusercontent.com/Ifem1/flowed/eb7cfea7fa192517186334a900dba33ee6a70dd9/demo-evidence/step-2.txt`
+3. criterion: `The evidence states that Flowed demo stage 3 is complete.`
+   source: `https://raw.githubusercontent.com/Ifem1/flowed/eb7cfea7fa192517186334a900dba33ee6a70dd9/demo-evidence/step-3.txt`
 
-The deployment transaction requires a funded wallet signature. Flowed itself sends no constructor value; the wallet must only cover the network deployment fee shown by the current Studionet client/Studio quote.
+The payer and recipient must be distinct real wallet addresses. Never paste a private key into the browser or repository.
 
-## Post-deployment repository closure
+## Required finalized lifecycle
 
-After a canonical address exists:
+1. payer creates the Flow with exactly `0.03 GEN`
+2. recipient accepts
+3. recipient reviews step 1; after `SATISFIED` and the contest window, permissionlessly finalize
+4. recipient reviews step 2; payer contests with exactly `0.0005 GEN`; resolve against the same stored snapshot
+5. recipient reviews step 3; after `SATISFIED` and the contest window, permissionlessly finalize
+6. read per-Flow and global accounting from the contract and record only finalized observed values
 
-1. set `contractAddress` in `config.js` to the canonical address
-2. build with `FLOWED_CONTRACT_ADDRESS=<address> npm run build`
-3. deploy the static frontend
-4. run `FLOWED_CONTRACT_ADDRESS=<address> node scripts/live_full.mjs` to confirm finalized public reads
-5. execute the required 3-step live Flow with tiny real GEN
-6. pass its Flow ID and finalized tx hashes back through `scripts/live_full.mjs`
-7. record only actual proof in `docs/LIVE_VERIFICATION.md`
-8. rerun GitHub Actions and make the closure commit
-
-## Required live Flow
-
-Use `0.03 GEN` escrow with three `0.01 GEN` steps and commit-pinned immutable public evidence. Prove both the no-contest finalization path and the step-2 contest path with exact `0.0005 GEN` bond. Final escrow accounting must be `0.03 = 0.03 + 0 + 0`; final bond accounting must be `0.0005 = 0 + 0 + 0.0005`.
+Use `scripts/live_full.mjs` to re-read finalized state and supplied finalized transaction hashes after the signed lifecycle exists.
