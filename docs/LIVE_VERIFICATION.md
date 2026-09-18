@@ -17,9 +17,9 @@ Only observed finalized Studionet artifacts are recorded here. No Direct Mode mo
 - Deployment status: **FINALIZED**
 - Stable Studio leader execution: **SUCCESS**
 
-Independent repository verification ran successfully in GitHub Actions run `35338071491` using `scripts/verify_canonical_live.mjs`.
+Canonical live verification is automated in `.github/workflows/canonical-live.yml` using `scripts/verify_canonical_live.mjs`.
 
-Observed state from that finalized read:
+The first independent post-deployment proof observed:
 
 ```text
 get_flow_count = 0
@@ -46,11 +46,20 @@ Observed global bond invariant: **PASS**
 
 The probe is runtime evidence only. It is **not** the Flowed production contract.
 
-## Frontend
+## Production frontend
 
-Canonical frontend configuration is committed and the production build targets only `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`.
+- Live frontend: https://rawcdn.githack.com/Ifem1/flowed/5f4641dc0d1dd3f5348a3be05749105470418e4f/index.html
+- Frontend source snapshot: `5f4641dc0d1dd3f5348a3be05749105470418e4f`
+- Canonical contract configured: **PASS**
+- Studionet `61999` configured: **PASS**
+- Public read surface present: **PASS**
+- Injected wallet/write surface present: **PASS**
+- Wrong-network switch handling present: **PASS**
+- Finalized handling present: **PASS**
+- Fake `FLOWED_LIVE_FLOWS` fallback absent: **PASS**
+- Browser private-key UI absent: **PASS**
 
-Live frontend URL: **not yet available**. GitHub Pages publishing is prepared, but the repository Pages setting must be enabled externally before the workflow can publish.
+The public resources are fetched and checked by `scripts/verify_live_frontend.mjs` in the canonical-live GitHub Actions workflow.
 
 ## Canonical 3-step Flow
 
@@ -69,8 +78,10 @@ Not yet executed. A real payer and recipient must sign the lifecycle transaction
 - final per-Flow bond accounting
 - post-demo global accounting
 
-The immutable evidence files are pinned at commit `eb7cfea7fa192517186334a900dba33ee6a70dd9`; see `docs/DEPLOYMENT.md` for the exact criteria, URLs, amounts, and bond.
+Immutable evidence commit: `eb7cfea7fa192517186334a900dba33ee6a70dd9`.
+
+Exact amounts, criteria, and commit-pinned source URLs are recorded in `docs/DEPLOYMENT.md`.
 
 ## Direct Mode
 
-The preserved v0.2.16 Direct Mode tests currently fail in the pinned local harness during SDK import with `DecodingError: unexpected end of memory`. Flowed contract execution is never reached in that harness failure. This limitation is kept visible as a diagnostic and is not called a pass. Finalized real Studionet deployment/read evidence above is authoritative for the stable runtime.
+The preserved v0.2.16 Direct Mode tests fail in the pinned local harness during SDK import with `DecodingError: unexpected end of memory`. Flowed contract execution is never reached in that harness failure. The CI job is deliberately named as a diagnostic and does not claim Direct Mode PASS. Finalized real Studionet execution above is authoritative for the stable runtime.
