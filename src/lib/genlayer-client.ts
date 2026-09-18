@@ -1,4 +1,4 @@
-import { createClient } from 'genlayer-js';
+import { createClient, isSuccessful } from 'genlayer-js';
 import { studionet } from 'genlayer-js/chains';
 import { ExecutionResult, TransactionStatus, TransactionHashVariant } from 'genlayer-js/types';
 import type { CalldataEncodable, Hash } from 'genlayer-js/types';
@@ -67,9 +67,9 @@ export function abandonFlow(client: WalletClient, address: Address, flowId: bigi
 export function expireActiveFlow(client: WalletClient, address: Address, flowId: bigint) { return write(client, address, 'expire_active_flow', [flowId]); }
 
 export async function waitForFinalizedSuccess(client: ReturnType<typeof createReadClient>, hash: Hash) {
-  const receipt = await client.waitForTransactionReceipt({ hash, status: TransactionStatus.FINALIZED });
-  if (receipt.txExecutionResultName !== ExecutionResult.FINISHED_WITH_RETURN) {
-    throw new Error(`GenLayer transaction finalized without success: ${String(receipt.txExecutionResultName)}`);
+  const receipt = await client.waitForTransactionReceipt({ hash, status: TransactionStatus.FINALIZED, fullTransaction: true });
+  if (!isSuccessful(receipt)) {
+    throw new Error(`GenLayer transaction finalized without success: ${String(receipt.txExecutionResultName ?? receipt.txExecutionResult ?? 'unknown')}`);
   }
   return receipt;
 }
