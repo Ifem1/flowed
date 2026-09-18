@@ -26,7 +26,7 @@ Flowed is already deployed. Do **not** redeploy or modify `contracts/Flowed.py`.
 
 Live app:
 
-https://rawcdn.githack.com/Ifem1/flowed/d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
+https://cdn.jsdelivr.net/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
 
 The frontend is a commit-pinned static production snapshot sourced from `d2016d4d2a164fc557caaaa83aafdd40bf68129b`. It contains the canonical Flowed address and cannot silently drift when later documentation commits land.
 
