@@ -55,12 +55,11 @@ button,a{touch-action:manipulation}
 .flow-halo{position:absolute;border-radius:50%;filter:blur(1px);pointer-events:none;z-index:-1}
 .halo-one{width:330px;height:330px;background:radial-gradient(circle at 50% 50%,rgba(217,92,50,.14),rgba(217,92,50,0) 68%);right:5%;top:6%;animation:floatHalo 9s ease-in-out infinite}
 .halo-two{width:390px;height:390px;background:radial-gradient(circle at 50% 50%,rgba(157,54,86,.11),rgba(157,54,86,0) 70%);left:0;bottom:0;animation:floatHalo 11s ease-in-out infinite reverse}
-.node-label{position:absolute;display:grid;gap:1px;padding:8px 10px;border:1px solid rgba(231,221,216,.88);background:rgba(255,252,248,.88);backdrop-filter:blur(10px);border-radius:11px;box-shadow:0 9px 30px rgba(80,31,49,.07);transition:transform .4s ease,border-color .4s ease,opacity .4s ease}
-.node-label span{font-size:8px;letter-spacing:.15em;color:var(--rose);font-weight:800}
-.node-label b{font-size:11px;letter-spacing:.04em}
-.node-label small{font-size:9px;color:var(--muted)}
-.node-label.active{transform:translateY(-4px);border-color:#D95C3270;box-shadow:0 13px 34px rgba(217,92,50,.12)}
-.label-funded{left:2%;bottom:7%}.label-step1{left:20%;top:43%}.label-verified{left:47%;top:5%}.label-released{right:13%;top:51%}.label-step2{right:0;top:22%}
+.node-label{position:absolute;z-index:4;display:grid;gap:2px;max-width:172px;padding:8px 10px;border:1px solid rgba(231,221,216,.9);background:rgba(255,252,248,.92);backdrop-filter:blur(10px);border-radius:11px;box-shadow:0 9px 30px rgba(80,31,49,.07);pointer-events:none;will-change:left,top;transition:border-color .35s ease,box-shadow .35s ease,background .35s ease,opacity .35s ease}
+.node-label b{font-size:10px;line-height:1.2;letter-spacing:.035em;white-space:nowrap}
+.node-label small{font-size:9px;line-height:1.25;color:var(--muted)}
+.node-label.active{border-color:#D95C3270;background:#FFF8F3;box-shadow:0 13px 34px rgba(217,92,50,.14)}
+.node-label.passed{opacity:.82}
 .mechanism{padding:120px 5.5% 140px;background:var(--warm);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .section-heading{max-width:1180px;margin:0 auto 60px;display:grid;grid-template-columns:1.1fr .9fr;align-items:end;column-gap:8%;row-gap:8px}
 .section-heading .kicker{grid-column:1/-1;margin-bottom:6px}
@@ -129,7 +128,7 @@ button,a{touch-action:manipulation}
 @media(max-width:800px){
   .site-header{top:10px;width:calc(100% - 20px);border-radius:15px}.site-header nav>a:first-child{display:none}
   .hero{padding:120px 20px 64px;gap:15px}.hero h1{font-size:clamp(52px,16vw,82px)}.hero-lede{font-size:17px}.architecture-line{max-width:280px}
-  .flow-visual{height:500px}.node-label{padding:6px 7px}.node-label small{display:none}.node-label b{font-size:9px}.label-verified{left:43%}.label-released{right:10%}
+  .flow-visual{height:500px}.node-label{padding:6px 7px;max-width:142px}.node-label small{display:none}.node-label b{font-size:9px}
   .mechanism{padding:90px 20px}.section-heading{grid-template-columns:1fr;margin-bottom:42px}.section-heading>p:last-child{margin-top:10px}
   .mechanism-track{grid-template-columns:1fr;gap:10px}.mechanism-card{min-height:240px}.stage-connector{width:2px;height:34px;margin:auto}.stage-connector i{transform:translateY(-101%)}.stage-connector.active i{transform:none}
   .trust{padding:95px 20px}.trust-title{margin-bottom:45px}.trust-grid{grid-template-columns:1fr;gap:16px}.semantic-panel,.money-panel{min-height:370px}.boundary-arrow{grid-template-columns:auto auto;justify-content:center}.boundary-arrow i{transform:rotate(90deg)}
@@ -139,7 +138,7 @@ button,a{touch-action:manipulation}
 @media(max-width:520px){
   .landing-brand span{font-size:18px}.brand-route{width:31px;height:31px}.nav-cta{padding:9px 11px}
   .hero{padding-left:16px;padding-right:16px}.hero-actions{align-items:stretch}.cta{width:100%}.hero h1{font-size:14.5vw}
-  .flow-visual{height:390px;margin-top:10px}.flow-svg{inset:3% -15% 0 -12%;width:127%}.node-label{transform:scale(.87);transform-origin:center}.node-label.active{transform:scale(.87) translateY(-4px)}.label-funded{left:-2%;bottom:2%}.label-step1{left:14%;top:42%}.label-verified{left:40%;top:3%}.label-released{right:6%;top:52%}.label-step2{right:-5%;top:20%}
+  .flow-visual{height:390px;margin-top:10px}.flow-svg{inset:3% -15% 0 -12%;width:127%}.node-label{max-width:124px;padding:5px 6px}.node-label b{font-size:8px}
   .mechanism,.trust,.contest{padding-left:16px;padding-right:16px}.section-heading h2,.trust h2,.contest h2{font-size:12vw}.mechanism-card{border-radius:19px}
   .semantic-panel,.money-panel{padding:22px;min-height:330px}.semantic-orbit{width:210px;height:210px}.semantic-center{width:126px;height:126px}
   .final-cta{padding-left:16px;padding-right:16px}.final-copy h2{font-size:15vw}
