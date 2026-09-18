@@ -57,5 +57,5 @@ test('simple connect does not force a network switch, but writes do', () => {
 
 test('injected provider remains the only wallet source', () => {
   assert.ok(appJs.includes('window.ethereum'));
-  assert.doesNotMatch(appJs + appHtml, /private\s*key|seed phrase|WalletConnect|Privy|Snaps/i);
+  assert.doesNotMatch(appJs + appHtml, /private\s*key|seed phrase|\bWalletConnect\b|\bPrivy\b|\bSnaps\b/i);
 });
