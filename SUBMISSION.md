@@ -14,11 +14,11 @@ Flowed turns funded work into a sequential semantic state machine: when GenLayer
 - stable Studio leader execution: `SUCCESS`
 - source unchanged after deployment: SHA-256 `0aac468a81efe683798271e0c38c6e582eeef515386bb8e4a1d8eed8defd72b4`
 
-## Live application
+## Production application
 
-- production frontend: https://cdn.statically.io/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
-- frontend source snapshot: `d2016d4d2a164fc557caaaa83aafdd40bf68129b`
-- public resources/config verified automatically from the live URL
+- Vercel deployment: **pending final external deployment**
+- `vercel.json` builds `npm run build` and serves `dist`
+- `scripts/verify_live_frontend.mjs` is ready to verify the final Vercel URL
 - canonical contract and Studionet 61999 are hard-wired in production config
 - finalized public reads work without wallet
 - writes use injected EIP-1193 wallet only
@@ -27,7 +27,7 @@ Flowed turns funded work into a sequential semantic state machine: when GenLayer
 
 ## CI and runtime evidence
 
-Contract tests, contract static validation, GenVM lint/SDK validation, frontend lint/typecheck/tests/build, canonical live Studionet verification, and live frontend verification are all repository gates.
+Contract tests, contract static validation, GenVM lint/SDK validation, frontend lint/typecheck/tests/build, and canonical live Studionet verification are repository gates. Live frontend verification runs immediately after the Vercel URL exists.
 
 The pinned Direct Mode harness cannot decode the stable v0.2.16 message format and raises `DecodingError: unexpected end of memory` during SDK import before Flowed executes. The tests remain in the repository and run transparently as a diagnostic; this limitation is not represented as a Direct Mode pass. The stable loader probe and full canonical Flowed deployment finalized successfully on real Studionet.
 
