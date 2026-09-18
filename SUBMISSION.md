@@ -16,7 +16,7 @@ Flowed turns funded work into a sequential semantic state machine: when GenLayer
 
 ## Live application
 
-- production frontend: https://cdn.jsdelivr.net/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
+- production frontend: https://cdn.statically.io/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
 - frontend source snapshot: `d2016d4d2a164fc557caaaa83aafdd40bf68129b`
 - public resources/config verified automatically from the live URL
 - canonical contract and Studionet 61999 are hard-wired in production config
