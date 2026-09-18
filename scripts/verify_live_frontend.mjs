@@ -1,4 +1,4 @@
-const BASE = 'https://rawcdn.githack.com/Ifem1/flowed/5f4641dc0d1dd3f5348a3be05749105470418e4f';
+const BASE = 'https://rawcdn.githack.com/Ifem1/flowed/6ec9f1dc880c0c18c05ebbad2044570fa3eac511';
 const CONTRACT = '0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad';
 
 async function get(path) {
@@ -10,11 +10,12 @@ async function get(path) {
   return { url, text, contentType: response.headers.get('content-type') || '' };
 }
 
-const [index, styles, app, config] = await Promise.all([
+const [index, styles, app, config, lossless] = await Promise.all([
   get('index.html'),
   get('styles.css'),
   get('app.js'),
   get('config.js'),
+  get('lossless-json.js'),
 ]);
 
 if (!index.text.includes('Work moves. Money follows.')) throw new Error('Live HTML missing Flowed identity');
@@ -29,6 +30,8 @@ for (const method of ['create_flow','accept_flow','review_active_step','contest_
 }
 if (!app.text.includes('wallet_switchEthereumChain')) throw new Error('Live app missing wrong-network switch handling');
 if (!app.text.includes('TransactionStatus.FINALIZED')) throw new Error('Live app missing finalized transaction handling');
+if (!app.text.includes("parseLosslessJson")) throw new Error('Live app missing lossless contract JSON parsing');
+if (!lossless.text.includes('stringifyJsonIntegers')) throw new Error('Live lossless JSON module missing');
 if (app.text.includes('FLOWED_LIVE_FLOWS')) throw new Error('Live app contains forbidden mock flow source');
 if (/private\s*key|private_key|FLOWED_PRIVATE_KEY/i.test(app.text + index.text)) {
   throw new Error('Live frontend exposes private-key wording');
@@ -45,11 +48,13 @@ console.log(JSON.stringify({
     css: styles.contentType,
     js: app.contentType,
     config: config.contentType,
+    losslessJson: lossless.contentType,
   },
   publicReads: 'PASS',
   writeSurface: 'PASS',
   wrongNetworkHandling: 'PASS',
   finalizedHandlingPresent: 'PASS',
+  losslessContractJson: 'PASS',
   mockFallbackAbsent: true,
   privateKeyUiAbsent: true,
 }, null, 2));
