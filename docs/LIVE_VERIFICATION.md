@@ -48,7 +48,7 @@ The probe is runtime evidence only. It is **not** the Flowed production contract
 
 ## Production frontend
 
-- Live frontend: https://cdn.jsdelivr.net/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
+- Live frontend: https://cdn.statically.io/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
 - Frontend source snapshot: `d2016d4d2a164fc557caaaa83aafdd40bf68129b`
 - Canonical contract configured: **PASS**
 - Studionet `61999` configured: **PASS**
