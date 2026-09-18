@@ -2,10 +2,16 @@ import { createClient } from 'https://esm.sh/genlayer-js@1.1.8';
 import { parseLosslessJson } from './lossless-json.js';
 import { studionet } from 'https://esm.sh/genlayer-js@1.1.8/chains';
 import { TransactionHashVariant, TransactionStatus } from 'https://esm.sh/genlayer-js@1.1.8/types';
-
-const CHAIN_ID = 61999;
-const CHAIN_HEX = '0xf22f';
-const RPC = 'https://studio.genlayer.com/api';
+import {
+  FLOWED_CHAIN_ID as CHAIN_ID,
+  shortenWalletAddress,
+  disconnectFlowedState,
+  applyChainChanged,
+  walletMenuItems,
+  copyFullWalletAddress,
+  switchToStudionet,
+  ensureWriteNetwork,
+} from './wallet-ux.js';
 const CONFIG = window.FLOWED_CONFIG || {};
 const CONTRACT = String(CONFIG.contractAddress || '').trim();
 const readClient = createClient({ chain: studionet });
@@ -15,7 +21,7 @@ const $$ = (selector) => [...document.querySelectorAll(selector)];
 
 function parseGen(value) { const raw=String(value).trim(); if(!/^\d+(\.\d{1,18})?$/.test(raw)) throw new Error('GEN amount must have at most 18 decimals.'); const [w,f='']=raw.split('.'); return BigInt(w)*10n**18n+BigInt(f.padEnd(18,'0')); }
 function formatGen(value) { const wei=BigInt(value||0), w=wei/10n**18n, f=(wei%10n**18n).toString().padStart(18,'0').replace(/0+$/,''); return `${w}${f?`.${f}`:''}`; }
-function short(address){return address?`${address.slice(0,6)}…${address.slice(-4)}`:'—';}
+const short=shortenWalletAddress;
 function safeJson(value){return parseLosslessJson(value);}
 function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[c]);}
 function toast(message,isError=false){const n=$('#toast');n.textContent=message;n.classList.toggle('error',isError);n.classList.add('show');setTimeout(()=>n.classList.remove('show'),3500);}
@@ -37,10 +43,79 @@ function availableActions(flow){const w=state.wallet.toLowerCase(),payer=String(
 function renderDetail(flow){if(!flow)return;state.selected=flow.id;const steps=(flow.steps||[]).map((s,i)=>{const active=i===Number(flow.active)&&['ACTIVE','PROVISIONAL','CONTESTED'].includes(flow.state),released=i<Number(flow.active)||flow.state==='COMPLETED';return `<div class="step-row ${active?'active':''} ${released?'released':''}"><div class="step-index">${i+1}</div><div><h4>${escapeHtml(s.title)}</h4><p>${escapeHtml(s.criteria)}</p><div class="source-list">${(s.sources||[]).map(x=>`<a href="${escapeHtml(x.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(x.label)} · ${x.required?'required':'optional'}</a>`).join('')}</div><small>${formatGen(s.amount_wei)} GEN · TTL ${s.ttl_seconds}s${s.deadline?` · deadline ${new Date(Number(s.deadline)*1000).toLocaleString()}`:''}</small>${s.last_review_label?`<p>Latest review: <b>${escapeHtml(s.last_review_label)}</b>${s.snapshot_digest?` · digest <code>${escapeHtml(s.snapshot_digest)}</code>`:''}</p>`:''}</div></div>`;}).join('');const actions=availableActions(flow).map(([m,l])=>`<button class="primary action-btn" data-method="${m}" data-flow-id="${flow.id}">${escapeHtml(l)}</button>`).join('');const manifests=(flow.manifests||[]).slice().reverse().map(m=>`<tr><td>${escapeHtml(m.phase)}</td><td>${m.round}</td><td>${escapeHtml(m.label)}</td><td><code>${escapeHtml(m.snapshot_digest)}</code></td><td>${new Date(Number(m.timestamp)*1000).toLocaleString()}</td></tr>`).join('');$('#detail-content').innerHTML=`<div class="page-heading"><div><p class="eyebrow">FLOW #${flow.id}</p><h1>${escapeHtml(flow.title)}</h1><p class="lede">${escapeHtml(flow.summary)}</p></div><span class="status ${String(flow.state).toLowerCase()}">${escapeHtml(flow.state)}</span></div><div class="stats"><div class="stat-card"><span>FUNDED</span><strong>${formatGen(flow.escrow)} GEN</strong></div><div class="stat-card"><span>RELEASED</span><strong>${formatGen(flow.released)} GEN</strong></div><div class="stat-card"><span>REFUNDED</span><strong>${formatGen(flow.refunded)} GEN</strong></div><div class="stat-card"><span>REMAINING</span><strong>${formatGen(flow.remaining)} GEN</strong></div></div><div class="panel"><p>Payer <code>${escapeHtml(flow.payer)}</code></p><p>Recipient <code>${escapeHtml(flow.recipient)}</code></p><p>Contest window ${flow.contest_window}s${flow.contest_deadline?` · provisional deadline ${new Date(Number(flow.contest_deadline)*1000).toLocaleString()}`:''}</p><p>Contest bond locked: ${formatGen(flow.contest_bond||0)} GEN</p><div class="action-row">${actions||'<span class="muted">No action available for this wallet/state.</span>'}</div></div><div class="panel"><h2>Ordered step rail</h2><div class="step-rail">${steps}</div></div><div class="panel"><h2>Review manifests</h2><div class="table-wrap"><table><thead><tr><th>Phase</th><th>Round</th><th>Label</th><th>Snapshot digest</th><th>Time</th></tr></thead><tbody>${manifests||'<tr><td colspan="5">No semantic reviews yet.</td></tr>'}</tbody></table></div></div><div class="panel"><h2>Per-Flow accounting</h2><p>Escrow: ${formatGen(flow.escrow)} = released ${formatGen(flow.released)} + refunded ${formatGen(flow.refunded)} + remaining ${formatGen(flow.remaining)}</p><p>Bonds received ${formatGen(flow.bonds_received||0)} = locked ${formatGen(flow.bonds_locked||0)} + returned ${formatGen(flow.bonds_returned||0)} + forfeited ${formatGen(flow.bonds_forfeited||0)}</p></div>`;bindDynamic();}
 function renderAll(){renderStats();$('#flow-grid').innerHTML=listHtml(state.flows.slice(-3).reverse());$('#flow-list').innerHTML=listHtml([...state.flows].reverse());renderDashboard();if(state.selected)renderDetail(state.flows.find(f=>f.id===state.selected));bindDynamic();}
 function showView(name){$$('.view').forEach(v=>v.classList.remove('active-view'));$(`#${name}-view`)?.classList.add('active-view');$$('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view===name));$('#page-title').textContent=({overview:'Overview',flows:'All flows',dashboard:'Dashboard',create:'Create Flow',detail:'Flow detail'})[name]||name;}
-async function connectWallet(){if(!window.ethereum)throw new Error('No injected wallet provider found.');const accounts=await window.ethereum.request({method:'eth_requestAccounts'});state.wallet=accounts?.[0]||'';state.chainId=Number.parseInt(await window.ethereum.request({method:'eth_chainId'}),16);updateWalletUi();renderDashboard();}
-async function switchNetwork(){if(!window.ethereum)throw new Error('No injected wallet provider found.');try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:CHAIN_HEX}]});}catch(error){if(error?.code!==4902)throw error;await window.ethereum.request({method:'wallet_addEthereumChain',params:[{chainId:CHAIN_HEX,chainName:'GenLayer Studionet',nativeCurrency:{name:'GEN',symbol:'GEN',decimals:18},rpcUrls:[RPC]}]});}state.chainId=CHAIN_ID;updateWalletUi();}
-function updateWalletUi(){const connected=Boolean(state.wallet);$('#wallet-label').textContent=connected?'Connected':'Read-only';$('#wallet-address').textContent=connected?short(state.wallet):'Public reads enabled';['#connect','#top-connect','#dashboard-connect'].forEach(s=>{$(s).textContent=connected?short(state.wallet):'Connect wallet';});$('#chain-state').textContent=connected&&state.chainId!==CHAIN_ID?`Wrong chain · ${state.chainId}`:'Studionet 61999';$('#chain-state').classList.toggle('wrong',Boolean(connected&&state.chainId!==CHAIN_ID));}
-async function walletClient(){if(!state.wallet)await connectWallet();if(state.chainId!==CHAIN_ID)await switchNetwork();return createClient({chain:studionet,account:state.wallet,provider:window.ethereum});}
+function closeWalletMenu({ focusTrigger = false } = {}) {
+  const menu = $('#wallet-menu');
+  if (!menu) return;
+  menu.hidden = true;
+  $('#top-connect')?.setAttribute('aria-expanded', 'false');
+  if (focusTrigger) $('#top-connect')?.focus();
+}
+function syncWalletMenu(){
+  const address=$('#wallet-menu-address');
+  if(address)address.textContent=state.wallet||'—';
+  const items=walletMenuItems(state);
+  const switchItem=$('#switch-wallet-network');
+  if(switchItem)switchItem.hidden=!items.includes('Switch to Studionet');
+}
+function openWalletMenu(){
+  if(!state.wallet)return;
+  syncWalletMenu();
+  const menu=$('#wallet-menu');
+  if(!menu)return;
+  menu.hidden=false;
+  $('#top-connect')?.setAttribute('aria-expanded','true');
+  requestAnimationFrame(()=>menu.querySelector('[role="menuitem"]:not([hidden])')?.focus());
+}
+function toggleWalletMenu(){
+  if(!state.wallet)return connectWallet();
+  const menu=$('#wallet-menu');
+  if(menu?.hidden)openWalletMenu();else closeWalletMenu();
+}
+async function connectWallet(){
+  if(!window.ethereum)throw new Error('No injected wallet provider found.');
+  const accounts=await window.ethereum.request({method:'eth_requestAccounts'});
+  state.wallet=accounts?.[0]||'';
+  state.chainId=Number.parseInt(await window.ethereum.request({method:'eth_chainId'}),16);
+  closeWalletMenu();
+  updateWalletUi();
+  renderDashboard();
+}
+async function switchNetwork(){
+  state.chainId=await switchToStudionet(window.ethereum);
+  updateWalletUi();
+  renderDashboard();
+  toast('Switched to GenLayer Studionet.');
+}
+async function copyConnectedAddress(){
+  await copyFullWalletAddress(state.wallet,navigator.clipboard);
+  closeWalletMenu();
+  toast('Wallet address copied.');
+}
+function disconnectFromFlowed(){
+  disconnectFlowedState(state);
+  closeWalletMenu();
+  updateWalletUi();
+  renderAll();
+  toast('Disconnected from Flowed.');
+}
+function updateWalletUi(){
+  const connected=Boolean(state.wallet),wrong=Boolean(connected&&state.chainId!==CHAIN_ID);
+  $('#wallet-label').textContent=connected?'Connected':'Read-only';
+  $('#wallet-address').textContent=connected?short(state.wallet):'Public reads enabled';
+  ['#connect','#top-connect','#dashboard-connect'].forEach(s=>{const n=$(s);if(n)n.textContent=connected?short(state.wallet):'Connect wallet';});
+  const chain=$('#chain-state');
+  chain.textContent=wrong?`Wrong chain · ${state.chainId}`:'Studionet 61999';
+  chain.classList.toggle('wrong',wrong);
+  chain.title=wrong?'Switch to GenLayer Studionet':'Studionet 61999';
+  chain.setAttribute('aria-label',wrong?`Wrong chain ${state.chainId}. Switch to GenLayer Studionet`:'GenLayer Studionet 61999');
+  syncWalletMenu();
+}
+async function walletClient(){
+  if(!state.wallet)await connectWallet();
+  await ensureWriteNetwork(window.ethereum,state);
+  updateWalletUi();
+  return createClient({chain:studionet,account:state.wallet,provider:window.ethereum});
+}
 async function execute(method,args,value=0n){ensureContract();txStage('Awaiting signature',`${method} on Studionet 61999`);try{const client=await walletClient();const hash=await client.writeContract({address:CONTRACT,functionName:method,args,value});txStage('Submitted',hash);await readClient.waitForTransactionReceipt({hash,status:TransactionStatus.ACCEPTED});txStage('Consensus',hash);txStage('Finalizing',hash);const receipt=await readClient.waitForTransactionReceipt({hash,status:TransactionStatus.FINALIZED,fullTransaction:true});if(!finalizedSuccess(receipt))throw new Error(`Finalized execution failed: ${receipt.txExecutionResultName||receipt.txExecutionResult||'unknown result'}`);txStage('Completed',hash);clearTx();toast('Transaction finalized successfully.');await refresh();return receipt;}catch(error){txStage('Failed',error.message||String(error));toast(error.message||String(error),true);throw error;}}
 async function runAction(method,flowId){const flow=state.flows.find(f=>f.id===String(flowId));if(!flow)throw new Error('Flow not found.');const value=method==='contest_active_step'?BigInt(flow.steps[Number(flow.active)].amount_wei)/20n:0n;await execute(method,[BigInt(flowId)],value);}
 function stepTemplate(i){return `<div class="panel step-editor" data-step="${i}"><div class="panel-head"><h3>Step ${i+1}</h3><button type="button" class="text-btn remove-step">Remove</button></div><div class="form-row"><label>Step title<input class="step-title" maxlength="120" required placeholder="Frontend live" /></label><label>Amount (GEN)<input class="step-amount" inputmode="decimal" required placeholder="0.01" /></label></div><label>Frozen acceptance criteria<textarea class="step-criteria" maxlength="2000" required placeholder="The production frontend is publicly reachable and exposes the agreed user flows."></textarea></label><div class="form-row"><label>TTL (seconds)<input class="step-ttl" type="number" min="300" max="2592000" value="86400" required /></label><label>Evidence label<input class="source-label" maxlength="100" required placeholder="Production deployment" /></label></div><div class="form-row"><label>Frozen HTTPS evidence URL<input class="source-url" type="url" required placeholder="https://…" /></label><label class="check-label"><input class="source-required" type="checkbox" checked /> Required source</label></div></div>`;}
@@ -51,6 +126,38 @@ function updateCreateTotal(){let total=0n,valid=true;$$('.step-amount').forEach(
 function collectSteps(){return $$('.step-editor').map(n=>{const amount=parseGen(n.querySelector('.step-amount').value);if(amount<=0n||amount/20n<=0n)throw new Error('Each step needs a positive amount and non-zero 5% bond.');const url=n.querySelector('.source-url').value.trim();if(!url.startsWith('https://'))throw new Error('Evidence sources must use HTTPS.');return{title:n.querySelector('.step-title').value.trim(),criteria:n.querySelector('.step-criteria').value.trim(),amount_wei:amount.toString(),ttl_seconds:Number(n.querySelector('.step-ttl').value),sources:[{label:n.querySelector('.source-label').value.trim(),url,required:n.querySelector('.source-required').checked}]};});}
 async function submitFlow(event){event.preventDefault();const steps=collectSteps();if(steps.length<2||steps.length>8)throw new Error('Flow must contain 2–8 steps.');const escrow=steps.reduce((s,x)=>s+BigInt(x.amount_wei),0n),recipient=$('#recipient').value.trim(),acceptBy=Math.floor(new Date($('#accept-by').value).getTime()/1000),contest=Number($('#contest-window').value);if(!Number.isFinite(acceptBy)||acceptBy<=Math.floor(Date.now()/1000))throw new Error('Acceptance deadline must be in the future.');await execute('create_flow',[recipient,$('#flow-title').value.trim(),$('#summary').value.trim(),BigInt(acceptBy),BigInt(contest),escrow,JSON.stringify(steps)],escrow);showView('flows');}
 function bindDynamic(){$$('[data-flow-id]:not(.action-btn)').forEach(n=>{n.onclick=()=>{renderDetail(state.flows.find(f=>f.id===n.dataset.flowId));showView('detail');};});$$('.action-btn').forEach(b=>{b.onclick=()=>runAction(b.dataset.method,b.dataset.flowId).catch(()=>{});});}
-$$('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));['#connect','#top-connect','#dashboard-connect'].forEach(s=>$(s)?.addEventListener('click',()=>connectWallet().catch(e=>toast(e.message||String(e),true))));$('#add-step').addEventListener('click',addStep);$('#flow-form').addEventListener('submit',e=>submitFlow(e).catch(error=>toast(error.message||String(error),true)));
-if(window.ethereum?.on){window.ethereum.on('accountsChanged',accounts=>{state.wallet=accounts?.[0]||'';updateWalletUi();renderDashboard();});window.ethereum.on('chainChanged',chain=>{state.chainId=Number.parseInt(chain,16);updateWalletUi();});}
+$('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+$('#top-connect')?.addEventListener('click',()=>Promise.resolve(toggleWalletMenu()).catch(e=>toast(e.message||String(e),true)));
+['#connect','#dashboard-connect'].forEach(s=>$(s)?.addEventListener('click',()=>Promise.resolve(state.wallet?openWalletMenu():connectWallet()).catch(e=>toast(e.message||String(e),true))));
+$('#chain-state')?.addEventListener('click',()=>{if(state.wallet&&state.chainId!==CHAIN_ID)switchNetwork().catch(e=>toast(e.message||String(e),true));});
+$('#copy-wallet')?.addEventListener('click',()=>copyConnectedAddress().catch(e=>toast(e.message||String(e),true)));
+$('#switch-wallet-network')?.addEventListener('click',()=>{closeWalletMenu();switchNetwork().catch(e=>toast(e.message||String(e),true));});
+$('#disconnect-wallet')?.addEventListener('click',disconnectFromFlowed);
+document.addEventListener('click',(event)=>{const wrap=$('.wallet-menu-wrap');const menu=$('#wallet-menu');if(wrap&&menu&&!menu.hidden&&!wrap.contains(event.target))closeWalletMenu();});
+document.addEventListener('keydown',(event)=>{
+  if(event.key==='Escape'){closeWalletMenu({focusTrigger:true});return;}
+  const menu=$('#wallet-menu');
+  if(menu?.hidden||!['ArrowDown','ArrowUp'].includes(event.key))return;
+  const items=[...menu.querySelectorAll('[role="menuitem"]:not([hidden])')];
+  if(!items.length)return;
+  event.preventDefault();
+  const current=items.indexOf(document.activeElement);
+  const delta=event.key==='ArrowDown'?1:-1;
+  items[(current+delta+items.length)%items.length].focus();
+});
+$('#add-step').addEventListener('click',addStep);
+$('#flow-form').addEventListener('submit',e=>submitFlow(e).catch(error=>toast(error.message||String(error),true)));
+if(window.ethereum?.on){
+  window.ethereum.on('accountsChanged',accounts=>{
+    if(accounts?.[0])state.wallet=accounts[0];else disconnectFlowedState(state);
+    closeWalletMenu();
+    updateWalletUi();
+    renderAll();
+  });
+  window.ethereum.on('chainChanged',chain=>{
+    applyChainChanged(state,chain);
+    updateWalletUi();
+    renderAll();
+  });
+}
 addStep();addStep();updateWalletUi();refresh();
