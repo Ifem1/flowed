@@ -1,6 +1,10 @@
 name: Flowed CI
 on: [push, pull_request]
 
+concurrency:
+  group: flowed-ci
+  cancel-in-progress: true
+
 jobs:
   contract-static:
     name: contract-static
