@@ -8,8 +8,8 @@ Flowed is a funded sequential semantic workflow. One payer funds an entire 2–8
 
 ## Canonical production
 
-- Live app: https://rawcdn.githack.com/Ifem1/flowed/5f4641dc0d1dd3f5348a3be05749105470418e4f/index.html
-- Live frontend source snapshot: `5f4641dc0d1dd3f5348a3be05749105470418e4f`
+- Live app: https://rawcdn.githack.com/Ifem1/flowed/6ec9f1dc880c0c18c05ebbad2044570fa3eac511/index.html
+- Live frontend source snapshot: `6ec9f1dc880c0c18c05ebbad2044570fa3eac511`
 - Canonical contract: `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`
 - Network: **GenLayer Studionet**
 - Chain ID: `61999`
@@ -36,6 +36,7 @@ The canonical deployment is independently re-read from Studionet on every reposi
 - injected EIP-1193 wallet writes only; no private-key UI
 - Studionet `61999` network detection/switching
 - exact `BigInt` GEN parsing and write construction
+- lossless on-chain JSON integer parsing before any wei-to-`BigInt` conversion
 - finalized-success verification that supports the stable Studio v0.2.16 receipt shape
 - real Flow list, detail, dashboard, create-flow, manifests/history, accounting, actions, and transaction lifecycle UI
 - canonical production configuration; no fake Flow fallback and no fake transaction success
