@@ -48,8 +48,8 @@ The probe is runtime evidence only. It is **not** the Flowed production contract
 
 ## Production frontend
 
-- Live frontend: https://rawcdn.githack.com/Ifem1/flowed/6ec9f1dc880c0c18c05ebbad2044570fa3eac511/index.html
-- Frontend source snapshot: `6ec9f1dc880c0c18c05ebbad2044570fa3eac511`
+- Live frontend: https://rawcdn.githack.com/Ifem1/flowed/d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
+- Frontend source snapshot: `d2016d4d2a164fc557caaaa83aafdd40bf68129b`
 - Canonical contract configured: **PASS**
 - Studionet `61999` configured: **PASS**
 - Public read surface present: **PASS**
