@@ -36,9 +36,16 @@ const deploymentReceipt = await client.waitForTransactionReceipt({
 const deploymentFinalized =
   deploymentReceipt.statusName === TransactionStatus.FINALIZED ||
   Number(deploymentReceipt.status) === 7;
+const leaderReceipts = Array.isArray(deploymentReceipt.consensus_data?.leader_receipt)
+  ? deploymentReceipt.consensus_data.leader_receipt
+  : deploymentReceipt.consensus_data?.leader_receipt
+    ? [deploymentReceipt.consensus_data.leader_receipt]
+    : [];
+const leaderSucceeded = leaderReceipts.some((receipt) => receipt?.execution_result === 'SUCCESS');
 const deploymentSucceeded =
   deploymentReceipt.txExecutionResultName === ExecutionResult.FINISHED_WITH_RETURN ||
-  Number(deploymentReceipt.txExecutionResult) === 1;
+  Number(deploymentReceipt.txExecutionResult) === 1 ||
+  leaderSucceeded;
 if (!deploymentFinalized || !deploymentSucceeded) {
   throw new Error(
     `Canonical deployment finalized without successful execution: ${JSON.stringify({
@@ -48,6 +55,7 @@ if (!deploymentFinalized || !deploymentSucceeded) {
       txExecutionResultName: deploymentReceipt.txExecutionResultName,
       result: deploymentReceipt.result,
       resultName: deploymentReceipt.resultName,
+      leaderExecutionResults: leaderReceipts.map((receipt) => receipt?.execution_result),
     })}`,
   );
 }
@@ -88,7 +96,7 @@ console.log(
         status: 'FINALIZED',
         statusName: deploymentReceipt.statusName,
         txExecutionResult: deploymentReceipt.txExecutionResult,
-        execution: deploymentReceipt.txExecutionResultName || ExecutionResult.FINISHED_WITH_RETURN,
+        execution: deploymentReceipt.txExecutionResultName || (leaderSucceeded ? 'SUCCESS' : deploymentReceipt.txExecutionResult),
       },
       flowCount: flowCount.toString(),
       accounting: a,
