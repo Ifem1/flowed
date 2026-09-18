@@ -13,4 +13,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: 20}
       - run: npm ci
-      - run: node scripts/verify_canonical_live.mjs
+      - name: Verify canonical Studionet deployment and finalized reads
+        run: node scripts/verify_canonical_live.mjs
+      - name: Verify public production frontend CDN
+        run: node scripts/verify_live_frontend.mjs
