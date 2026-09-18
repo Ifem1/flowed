@@ -15,7 +15,7 @@
 
 ## Application
 
-- Live frontend: https://rawcdn.githack.com/Ifem1/flowed/d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
+- Live frontend: https://cdn.jsdelivr.net/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
 - Frontend source snapshot: `d2016d4d2a164fc557caaaa83aafdd40bf68129b`
 - Canonical contract wired in `config.js`: ✅
 - Production build defaults to and enforces the canonical contract: ✅
