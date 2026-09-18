@@ -70,8 +70,16 @@ export async function waitForFinalizedSuccess(client: ReturnType<typeof createRe
   const receipt = await client.waitForTransactionReceipt({ hash, status: TransactionStatus.FINALIZED, fullTransaction: true });
   const finalized =
     receipt.statusName === TransactionStatus.FINALIZED || Number(receipt.status) === 7;
+  const leaderReceiptRaw = (receipt as any).consensus_data?.leader_receipt;
+  const leaderReceipts = Array.isArray(leaderReceiptRaw)
+    ? leaderReceiptRaw
+    : leaderReceiptRaw
+      ? [leaderReceiptRaw]
+      : [];
   const succeeded =
-    receipt.txExecutionResultName === 'FINISHED_WITH_RETURN' || Number(receipt.txExecutionResult) === 1;
+    receipt.txExecutionResultName === 'FINISHED_WITH_RETURN' ||
+    Number(receipt.txExecutionResult) === 1 ||
+    leaderReceipts.some((item: any) => item?.execution_result === 'SUCCESS');
   if (!finalized || !succeeded) {
     throw new Error(`GenLayer transaction finalized without success: ${String(receipt.txExecutionResultName ?? receipt.txExecutionResult ?? 'unknown')}`);
   }
