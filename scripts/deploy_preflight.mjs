@@ -9,8 +9,12 @@ const text = source.toString('utf8');
 const sha256 = createHash('sha256').update(source).digest('hex');
 const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 
+const expectedVersion = '# v0.2.16';
 const expectedDepends = '# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }';
-if (text.split(/\r?\n/, 1)[0] !== expectedDepends) throw new Error('Flowed Depends header must be the first physical line');
+const physicalLines = text.split(/\r?\n/);
+if (physicalLines[0] !== expectedVersion || physicalLines[1] !== expectedDepends || physicalLines[2] !== '') {
+  throw new Error('Flowed header must be exactly v0.2.16, stable Depends, then a blank line');
+}
 if (!text.includes('class Flowed(gl.Contract)')) throw new Error('Production Flowed contract class not found');
 if (!/def __init__\(self\):/.test(text)) throw new Error('Flowed must deploy without constructor arguments');
 if (!text.includes('# v0.2.16')) throw new Error('Flowed must target the proven stable contract layout');
