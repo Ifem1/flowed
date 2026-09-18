@@ -216,7 +216,7 @@ class Flowed(gl.Contract):
                         required_unavailable = True
                     out.append({"label": src["label"], "url": src["url"], "required": src["required"], "status": "SOURCE_UNAVAILABLE"})
             return json.dumps({"required_unavailable": required_unavailable, "sources": out}, sort_keys=True, separators=(",", ":"))
-        snapshot = gl.eq_principle_strict_eq(fetch)
+        snapshot = gl.eq_principle.strict_eq(fetch)
         unavailable = json.loads(snapshot).get("required_unavailable", False)
         digest = hashlib.sha256(snapshot.encode()).hexdigest()
         return snapshot, digest, unavailable
@@ -226,7 +226,7 @@ class Flowed(gl.Contract):
         def classify():
             out = gl.nondet.exec_prompt(prompt)
             return out if isinstance(out, str) and out in LABELS else "MODEL_OUTPUT_INVALID"
-        return gl.eq_principle_strict_eq(classify)
+        return gl.eq_principle.strict_eq(classify)
 
     @gl.public.write
     def review_active_step(self, flow_id: u256):
