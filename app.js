@@ -46,9 +46,10 @@ function showView(name){$$('.view').forEach(v=>v.classList.remove('active-view')
 function closeWalletMenu({ focusTrigger = false } = {}) {
   const menu = $('#wallet-menu');
   if (!menu) return;
+  const wasOpen = !menu.hidden;
   menu.hidden = true;
   $('#top-connect')?.setAttribute('aria-expanded', 'false');
-  if (focusTrigger) $('#top-connect')?.focus();
+  if (focusTrigger && wasOpen) $('#top-connect')?.focus();
 }
 function syncWalletMenu(){
   const address=$('#wallet-menu-address');
@@ -149,6 +150,7 @@ $('#add-step').addEventListener('click',addStep);
 $('#flow-form').addEventListener('submit',e=>submitFlow(e).catch(error=>toast(error.message||String(error),true)));
 if(window.ethereum?.on){
   window.ethereum.on('accountsChanged',accounts=>{
+    if(!state.wallet)return;
     if(accounts?.[0])state.wallet=accounts[0];else disconnectFlowedState(state);
     closeWalletMenu();
     updateWalletUi();
