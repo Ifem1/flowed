@@ -1,2 +1,2 @@
 FLOWED DEMO EVIDENCE — STEP 2
-Frontend live: the production frontend exposes the agreed overview, flow detail, and create-flow user flows.
+The evidence states that Flowed demo stage 2 is complete.
