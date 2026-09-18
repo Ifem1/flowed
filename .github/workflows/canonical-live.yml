@@ -15,3 +15,9 @@ jobs:
       - run: npm ci
       - name: Verify canonical Studionet deployment and finalized reads
         run: node scripts/verify_canonical_live.mjs
+      - name: Verify Phase 1 production Vercel deployment
+        env:
+          FLOWED_LIVE_FRONTEND: https://flowed-eight.vercel.app
+          FLOWED_FRONTEND_RETRIES: 24
+          FLOWED_FRONTEND_RETRY_MS: 10000
+        run: node scripts/verify_live_frontend.mjs
