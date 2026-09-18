@@ -2,6 +2,8 @@
 
 Flowed is intentionally one production Intelligent Contract: `contracts/Flowed.py`. It is a funded sequential semantic state machine, not a generic escrow or AI payment allocator.
 
+The production contract is frozen at source commit `c628a86951d59de4c774d89cb4c8ae5cbb1e4e47` and deployed on GenLayer Studionet `61999` at `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`. Post-deployment repository commits may change frontend, CI, evidence, and documentation, but `contracts/Flowed.py` must remain byte-identical to the deployed source.
+
 ## State machine
 
 ```text
@@ -58,4 +60,10 @@ The exact contest bond is `step.amount / 20`.
 
 ## Browser architecture
 
-The browser uses `genlayer-js` against the canonical Studionet contract. `get_flow_count`, `get_flow`, `get_active_step`, and `get_accounting` are public reads and require no wallet. Writes use only an injected EIP-1193 provider, enforce chain `61999`, construct GEN values with `BigInt`, and wait for a finalized successful receipt before presenting completion.
+The browser uses `genlayer-js` against the canonical Studionet contract. `get_flow_count`, `get_flow`, `get_active_step`, and `get_accounting` are finalized public reads and require no wallet.
+
+Writes use only an injected EIP-1193 provider. The browser detects the connected chain, requests Studionet `61999` when needed, constructs all GEN values with `BigInt`, and displays transaction progress separately as awaiting signature, submitted, consensus, finalizing, completed, or failed.
+
+For stable Studio v0.2.16 finality, a write is considered complete only when the transaction is `FINALIZED` and successful execution is proven by either the SDK execution-result field or the stable Studio consensus leader receipt `execution_result: SUCCESS`. Merely reaching `ACCEPTED` is never treated as completion.
+
+The application reconstructs Flow lists, details, manifests, and accounting from canonical contract reads on reload; no JavaScript demo-flow object is an operational source of truth.
