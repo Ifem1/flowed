@@ -73,3 +73,17 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Verify built landing and /app route
+        run: |
+          test -f dist/index.html
+          test -f dist/app/index.html
+          test -f dist/landing.css
+          test -f dist/landing.js
+          test -f dist/styles.css
+          test -f dist/app.js
+          test -f dist/lossless-json.js
+          test -f dist/config.js
+          grep -F "WORK MOVES." dist/index.html
+          grep -F 'href="/app"' dist/index.html
+          grep -F 'id="flow-form"' dist/app/index.html
+          grep -F "0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad" dist/config.js
