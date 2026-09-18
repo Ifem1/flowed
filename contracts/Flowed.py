@@ -118,7 +118,7 @@ class Flowed(gl.Contract):
 
     @gl.public.write.payable
     def create_flow(self, recipient: Address, title: str, summary: str, accept_by: u256,
-                    contest_window_seconds: u256, escrow_amount: u256, steps_json: str):
+                    contest_window_seconds: u256, escrow_amount: u256, steps_json: str) -> None:
         now = _now()
         assert str(recipient).lower() != ZERO and recipient != gl.message.sender_address
         assert isinstance(title, str) and 0 < len(title) <= 140
@@ -145,7 +145,7 @@ class Flowed(gl.Contract):
         self.flows[fid] = json.dumps(f)
 
     @gl.public.write
-    def accept_flow(self, flow_id: u256):
+    def accept_flow(self, flow_id: u256) -> None:
         f = self._flow(flow_id)
         assert f["state"] == "OFFERED"
         assert str(gl.message.sender_address) == f["recipient"]
@@ -159,15 +159,15 @@ class Flowed(gl.Contract):
         self.flows[flow_id] = json.dumps(f)
 
     @gl.public.write
-    def decline_flow(self, flow_id: u256):
+    def decline_flow(self, flow_id: u256) -> None:
         self._refund_offer(flow_id, "DECLINED")
 
     @gl.public.write
-    def withdraw_offer(self, flow_id: u256):
+    def withdraw_offer(self, flow_id: u256) -> None:
         self._refund_offer(flow_id, "WITHDRAWN")
 
     @gl.public.write
-    def expire_unaccepted_flow(self, flow_id: u256):
+    def expire_unaccepted_flow(self, flow_id: u256) -> None:
         f = self._flow(flow_id)
         assert f["state"] == "OFFERED" and _now() > f["accept_by"]
         self._refund_offer(flow_id, "EXPIRED")
@@ -229,7 +229,7 @@ class Flowed(gl.Contract):
         return gl.eq_principle.strict_eq(classify)
 
     @gl.public.write
-    def review_active_step(self, flow_id: u256):
+    def review_active_step(self, flow_id: u256) -> None:
         f = self._flow(flow_id)
         assert f["state"] == "ACTIVE" and str(gl.message.sender_address) == f["recipient"]
         assert f["review_attempts"] < MAX_ATTEMPTS
@@ -255,7 +255,7 @@ class Flowed(gl.Contract):
         self.flows[flow_id] = json.dumps(f)
 
     @gl.public.write.payable
-    def contest_active_step(self, flow_id: u256):
+    def contest_active_step(self, flow_id: u256) -> None:
         f = self._flow(flow_id)
         assert f["state"] == "PROVISIONAL"
         assert str(gl.message.sender_address) == f["payer"]
@@ -276,13 +276,13 @@ class Flowed(gl.Contract):
         self.flows[flow_id] = json.dumps(f)
 
     @gl.public.write
-    def finalize_active_step(self, flow_id: u256):
+    def finalize_active_step(self, flow_id: u256) -> None:
         f = self._flow(flow_id)
         assert f["state"] == "PROVISIONAL" and _now() >= f["contest_deadline"]
         self._release(f, flow_id)
 
     @gl.public.write
-    def resolve_contest(self, flow_id: u256):
+    def resolve_contest(self, flow_id: u256) -> None:
         f = self._flow(flow_id)
         assert f["state"] == "CONTESTED"
         assert f["contest_attempts"] < MAX_ATTEMPTS
@@ -319,7 +319,7 @@ class Flowed(gl.Contract):
             self._send(f["payer"], bond)
 
     @gl.public.write
-    def finalize_stalled_contest(self, flow_id: u256):
+    def finalize_stalled_contest(self, flow_id: u256) -> None:
         f = self._flow(flow_id)
         assert f["state"] == "CONTESTED" and _now() >= f["contest_opened_at"] + RECOVERY
         bond = f["contest_bond"]
@@ -368,13 +368,13 @@ class Flowed(gl.Contract):
             self._send(refund_to, refund_amount)
 
     @gl.public.write
-    def abandon_flow(self, flow_id: u256):
+    def abandon_flow(self, flow_id: u256) -> None:
         f = self._flow(flow_id)
         assert f["state"] == "ACTIVE" and str(gl.message.sender_address) == f["recipient"]
         self._refund_remaining(f, flow_id, "ABANDONED")
 
     @gl.public.write
-    def expire_active_flow(self, flow_id: u256):
+    def expire_active_flow(self, flow_id: u256) -> None:
         f = self._flow(flow_id)
         assert f["state"] == "ACTIVE"
         deadline = f["steps"][f["active"]]["deadline"]
@@ -400,7 +400,7 @@ class Flowed(gl.Contract):
         return self.flows[flow_id]
 
     @gl.public.view
-    def get_accounting(self) -> dict:
+    def get_accounting(self) -> dict[str, u256]:
         remaining = self.funded - self.released - self.refunded
         return {"funded": self.funded, "released": self.released, "refunded": self.refunded,
                 "remaining": remaining, "bonds_received": self.bonds_received,
