@@ -26,9 +26,9 @@ Flowed is already deployed. Do **not** redeploy or modify `contracts/Flowed.py`.
 
 Live app:
 
-https://rawcdn.githack.com/Ifem1/flowed/5f4641dc0d1dd3f5348a3be05749105470418e4f/index.html
+https://rawcdn.githack.com/Ifem1/flowed/6ec9f1dc880c0c18c05ebbad2044570fa3eac511/index.html
 
-The frontend is a commit-pinned static production snapshot sourced from `5f4641dc0d1dd3f5348a3be05749105470418e4f`. It contains the canonical Flowed address and cannot silently drift when later documentation commits land.
+The frontend is a commit-pinned static production snapshot sourced from `6ec9f1dc880c0c18c05ebbad2044570fa3eac511`. It contains the canonical Flowed address and cannot silently drift when later documentation commits land.
 
 `scripts/verify_live_frontend.mjs` fetches the public HTML/CSS/JS/config resources and verifies the Flowed identity, canonical contract, chain `61999`, canonical RPC, public-read/write surface, wrong-network handling, finalized handling, absence of `FLOWED_LIVE_FLOWS`, and absence of browser private-key UI.
 
