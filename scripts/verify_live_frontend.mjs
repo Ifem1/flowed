@@ -10,38 +10,47 @@ const RETRY_MS = Number(process.env.FLOWED_FRONTEND_RETRY_MS || 10000);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function get(path) {
+async function fetchText(path) {
   const url = `${BASE}${path}`;
+  const response = await fetch(url, {
+    redirect: 'follow',
+    cache: 'no-store',
+    signal: AbortSignal.timeout(15000),
+    headers: { 'user-agent': 'Flowed-Phase1-Verification/1.0' },
+  });
+  if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
+  const text = await response.text();
+  if (!text.trim()) throw new Error(`${url}: empty response`);
+  return { url, text, contentType: response.headers.get('content-type') || '' };
+}
+
+async function waitForProductionLanding() {
   let lastError;
   for (let attempt = 1; attempt <= RETRIES; attempt += 1) {
     try {
-      const response = await fetch(url, {
-        redirect: 'follow',
-        cache: 'no-store',
-        signal: AbortSignal.timeout(15000),
-        headers: { 'user-agent': 'Flowed-Phase1-Verification/1.0' },
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const text = await response.text();
-      if (!text.trim()) throw new Error('empty response');
-      return { url, text, contentType: response.headers.get('content-type') || '' };
+      const page = await fetchText('/');
+      if (!page.text.includes('WORK MOVES.') || !page.text.includes('MONEY FOLLOWS.')) {
+        throw new Error('production alias still serves the previous build');
+      }
+      return page;
     } catch (error) {
       lastError = error;
+      console.log(`Vercel production wait ${attempt}/${RETRIES}: ${error.message || error}`);
       if (attempt < RETRIES) await sleep(RETRY_MS);
     }
   }
-  throw new Error(`${url}: ${lastError?.message || lastError}`);
+  throw new Error(`Production landing did not update: ${lastError?.message || lastError}`);
 }
 
-const [landing, appPage, landingCss, landingJs, appCss, appJs, config, lossless] = await Promise.all([
-  get('/'),
-  get('/app'),
-  get('/landing.css'),
-  get('/landing.js'),
-  get('/styles.css'),
-  get('/app.js'),
-  get('/config.js'),
-  get('/lossless-json.js'),
+const landing = await waitForProductionLanding();
+const [appPage, landingCss, landingJs, appCss, appJs, config, lossless] = await Promise.all([
+  fetchText('/app'),
+  fetchText('/landing.css'),
+  fetchText('/landing.js'),
+  fetchText('/styles.css'),
+  fetchText('/app.js'),
+  fetchText('/config.js'),
+  fetchText('/lossless-json.js'),
 ]);
 
 for (const page of [landing, appPage]) {
