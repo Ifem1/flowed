@@ -4,76 +4,158 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Flowed — funded sequential semantic workflows. Work moves. Money follows." />
+  <meta name="theme-color" content="#F7F3EE" />
   <title>Flowed · Work moves. Money follows.</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23121b2b'/%3E%3Cpath d='M7 10h8v6h10M7 22h8v-6' fill='none' stroke='%235eead4' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='14' fill='%23501F31'/%3E%3Cpath d='M11 31c7 0 5-14 13-14 7 0 5 14 13 14' fill='none' stroke='%23D95C32' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='11' cy='31' r='3' fill='%23FFFCF8'/%3E%3Ccircle cx='24' cy='17' r='3' fill='%23FFFCF8'/%3E%3Ccircle cx='37' cy='31' r='3' fill='%23FFFCF8'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="/landing.css" />
 </head>
 <body>
-  <div class="shell">
-    <aside class="sidebar">
-      <a class="brand" href="#overview"><span class="brand-mark">↝</span><span>flowed</span></a>
-      <div class="network"><span class="pulse"></span> Studionet <b>61999</b></div>
-      <nav>
-        <button class="nav-item active" data-view="overview"><span>◈</span> Overview</button>
-        <button class="nav-item" data-view="flows"><span>▤</span> All flows</button>
-        <button class="nav-item" data-view="dashboard"><span>◎</span> Dashboard</button>
-        <button class="nav-item" data-view="create"><span>＋</span> Create a flow</button>
-      </nav>
-      <div class="sidebar-foot">
-        <div class="wallet-chip"><span class="avatar">●</span><div><strong id="wallet-label">Read-only</strong><small id="wallet-address">Public reads enabled</small></div><span class="dot"></span></div>
-        <button class="ghost-btn" id="connect">Connect wallet</button>
+  <header class="site-header">
+    <a class="landing-brand" href="/" aria-label="Flowed home">
+      <svg class="brand-route" viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M11 31c7 0 5-14 13-14 7 0 5 14 13 14"></path>
+        <circle cx="11" cy="31" r="3"></circle><circle cx="24" cy="17" r="3"></circle><circle cx="37" cy="31" r="3"></circle>
+      </svg>
+      <span>flowed</span>
+    </a>
+    <nav aria-label="Landing navigation">
+      <a href="#mechanism">How it works</a>
+      <a class="nav-cta" href="/app">Open Flowed <span>→</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero landing-section" id="top">
+      <div class="hero-copy reveal">
+        <p class="kicker">FUNDED SEQUENTIAL SEMANTIC WORKFLOWS</p>
+        <h1>WORK MOVES.<br><span>MONEY FOLLOWS.</span></h1>
+        <p class="hero-lede">Fund an ordered workflow once. GenLayer verifies each completed step. The contract releases only the amount already committed to that step.</p>
+        <div class="hero-actions">
+          <a class="cta primary-cta" href="/app">OPEN FLOWED <span>→</span></a>
+          <a class="cta secondary-cta" href="#mechanism">SEE HOW IT WORKS</a>
+        </div>
+        <p class="architecture-line">GenLayer verifies progression. Deterministic code moves funds.</p>
       </div>
-    </aside>
-    <main>
-      <header class="topbar">
-        <div class="mobile-brand">↝ flowed</div>
-        <div class="crumb">Flowed / <strong id="page-title">Overview</strong></div>
-        <div class="top-actions"><span id="chain-state" class="network-pill">Studionet 61999</span><button class="top-connect" id="top-connect">Connect wallet</button></div>
-      </header>
-      <div class="content">
-        <div id="deployment-banner" class="panel notice" hidden></div>
-        <section id="overview-view" class="view active-view">
-          <div class="welcome"><div><p class="eyebrow">FUNDED SEQUENTIAL SEMANTIC WORKFLOWS</p><h1>Work moves. Money follows.</h1><p class="lede">A payer funds the complete workflow. GenLayer judges only whether the active step satisfies its frozen criteria; deterministic contract logic releases the precommitted tranche and activates the next step.</p></div><button class="primary" data-view="create">Create a flow <span>↗</span></button></div>
-          <div class="stats" id="global-stats"><div class="stat-card"><span>FUNDED</span><strong>—</strong></div><div class="stat-card"><span>RELEASED</span><strong>—</strong></div><div class="stat-card"><span>REMAINING</span><strong>—</strong></div><div class="stat-card"><span>FLOWS</span><strong>—</strong></div></div>
-          <div class="section-head"><div><p class="eyebrow">ON-CHAIN</p><h2>Flows in motion</h2></div><button class="text-btn" data-view="flows">View all →</button></div>
-          <div class="flow-grid" id="flow-grid"><div class="panel empty">Loading contract state…</div></div>
-          <div class="panel principle"><div class="principle-kicker">THE FLOWED PRINCIPLE</div><blockquote>“GenLayer verifies progression. <em>The contract moves the money.</em>”</blockquote><p>Payment amount, recipient, ordering, active step, and refunds are deterministic and frozen outside model control.</p></div>
-        </section>
 
-        <section id="flows-view" class="view">
-          <div class="page-heading"><div><p class="eyebrow">PUBLIC READS</p><h1>All flows</h1><p class="lede">Real finalized state from the canonical Flowed contract. Wallet connection is not required.</p></div><button class="primary" data-view="create">＋ New flow</button></div>
-          <div class="list" id="flow-list"></div>
-        </section>
-
-        <section id="dashboard-view" class="view">
-          <div class="page-heading"><div><p class="eyebrow">PARTICIPANT VIEW</p><h1>Dashboard</h1><p class="lede">Flows where the connected wallet is payer or recipient.</p></div><button class="top-connect" id="dashboard-connect">Connect wallet</button></div>
-          <div class="split"><div class="panel"><h3>Flows I pay</h3><div id="payer-flows" class="list"></div></div><div class="panel"><h3>Flows I receive</h3><div id="recipient-flows" class="list"></div></div></div>
-        </section>
-
-        <section id="detail-view" class="view">
-          <button class="back text-btn" data-view="flows">← Back to flows</button>
-          <div id="detail-content"></div>
-        </section>
-
-        <section id="create-view" class="view">
-          <button class="back text-btn" data-view="overview">← Back</button>
-          <div class="page-heading"><div><p class="eyebrow">NEW FUNDED WORKFLOW</p><h1>Create a Flow</h1><p class="lede">Freeze 2–8 ordered steps, their exact tranches, criteria, evidence, and timing before funding.</p></div></div>
-          <form class="form-card wide-form" id="flow-form">
-            <div class="form-row"><label>Flow title<input id="flow-title" required maxlength="140" placeholder="Launch analytics dashboard" /></label><label>Recipient wallet<input id="recipient" required pattern="0x[a-fA-F0-9]{40}" placeholder="0x…" /></label></div>
-            <label>Summary<textarea id="summary" maxlength="2400" placeholder="What this funded workflow delivers"></textarea></label>
-            <div class="form-row"><label>Accept by<input id="accept-by" type="datetime-local" required /></label><label>Contest window (seconds)<input id="contest-window" type="number" min="60" max="604800" step="1" value="3600" required /></label></div>
-            <div class="section-head"><div><p class="eyebrow">ORDERED STEPS</p><h2>Frozen work sequence</h2></div><button type="button" id="add-step" class="ghost-btn">＋ Add step</button></div>
-            <div id="step-editor"></div>
-            <div class="panel review-box"><div><span>Total escrow</span><strong id="create-total">0 GEN</strong></div><p>Contest bond per provisional step is exactly 5% of that step’s frozen amount.</p></div>
-            <div class="form-footer"><span id="create-note">Wallet required only when funding.</span><button class="primary" type="submit">Fund Flow <span>→</span></button></div>
-          </form>
-        </section>
+      <div class="flow-visual reveal" aria-label="Animated sequential workflow: funded, step one, verified, released, step two">
+        <div class="flow-halo halo-one"></div>
+        <div class="flow-halo halo-two"></div>
+        <svg class="flow-svg" viewBox="0 0 1000 620" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="flowStroke" x1="0" x2="1">
+              <stop offset="0%" stop-color="#D95C32"/>
+              <stop offset="58%" stop-color="#9D3656"/>
+              <stop offset="100%" stop-color="#501F31"/>
+            </linearGradient>
+            <filter id="orbGlow" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="11" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <path class="route-shadow" d="M90 488 C180 424 126 310 270 280 C420 250 388 118 548 142 C688 164 638 338 776 328 C878 320 858 224 950 196"/>
+          <path id="hero-route" class="route-line" d="M90 488 C180 424 126 310 270 280 C420 250 388 118 548 142 C688 164 638 338 776 328 C878 320 858 224 950 196"/>
+          <g class="route-node node-funded" data-route-node="0"><circle cx="90" cy="488" r="17"/><circle class="node-core" cx="90" cy="488" r="5"/></g>
+          <g class="route-node node-step1" data-route-node="1"><circle cx="270" cy="280" r="17"/><circle class="node-core" cx="270" cy="280" r="5"/></g>
+          <g class="route-node node-verified" data-route-node="2"><circle cx="548" cy="142" r="17"/><circle class="node-core" cx="548" cy="142" r="5"/></g>
+          <g class="route-node node-released" data-route-node="3"><circle cx="776" cy="328" r="17"/><circle class="node-core" cx="776" cy="328" r="5"/></g>
+          <g class="route-node node-step2" data-route-node="4"><circle cx="950" cy="196" r="17"/><circle class="node-core" cx="950" cy="196" r="5"/></g>
+          <circle id="flow-orb" class="flow-orb" r="11" cx="90" cy="488" filter="url(#orbGlow)"/>
+        </svg>
+        <div class="node-label label-funded"><span>01</span><b>FUNDED</b><small>0.030 GEN locked</small></div>
+        <div class="node-label label-step1"><span>02</span><b>STEP 01</b><small>Active work only</small></div>
+        <div class="node-label label-verified"><span>03</span><b>VERIFIED</b><small>Semantic decision</small></div>
+        <div class="node-label label-released"><span>04</span><b>RELEASED</b><small>Frozen tranche moves</small></div>
+        <div class="node-label label-step2"><span>05</span><b>STEP 02</b><small>Now activated</small></div>
       </div>
-    </main>
-  </div>
-  <div class="tx-panel" id="tx-panel" hidden><strong id="tx-stage">Awaiting signature</strong><small id="tx-detail"></small></div>
-  <div class="toast" id="toast"></div>
-  <script src="config.js"></script>
-  <script type="module" src="app.js"></script>
+    </section>
+
+    <section class="mechanism landing-section" id="mechanism">
+      <div class="section-heading reveal">
+        <p class="kicker">THE MECHANISM</p>
+        <h2>One workflow.<br>Ordered execution.</h2>
+        <p>The next stage does not become active until the previous one clears the protocol boundary.</p>
+      </div>
+      <div class="mechanism-track" data-sequence>
+        <article class="mechanism-card reveal" data-seq="0">
+          <span class="stage-number">01</span>
+          <div class="stage-icon funding-icon"><i></i><i></i><i></i></div>
+          <h3>FUND</h3>
+          <p>Entire workflow funded upfront.</p>
+        </article>
+        <div class="stage-connector" aria-hidden="true"><i></i></div>
+        <article class="mechanism-card reveal" data-seq="1">
+          <span class="stage-number">02</span>
+          <div class="stage-icon verify-icon"><i></i></div>
+          <h3>VERIFY</h3>
+          <p>GenLayer judges only the active step.</p>
+        </article>
+        <div class="stage-connector" aria-hidden="true"><i></i></div>
+        <article class="mechanism-card reveal" data-seq="2">
+          <span class="stage-number">03</span>
+          <div class="stage-icon release-icon"><i></i><i></i></div>
+          <h3>RELEASE</h3>
+          <p>Deterministic code moves the frozen tranche.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="trust landing-section" id="trust">
+      <div class="trust-title reveal">
+        <p class="kicker">THE TRUST BOUNDARY</p>
+        <h2>AI verifies progression.<br><span>It never decides the money.</span></h2>
+      </div>
+      <div class="trust-grid">
+        <article class="semantic-panel reveal">
+          <p class="panel-label">SEMANTIC DECISION</p>
+          <div class="semantic-orbit">
+            <span class="evidence-dot e1"></span><span class="evidence-dot e2"></span><span class="evidence-dot e3"></span>
+            <div class="semantic-center"><small>ACTIVE STEP</small><b>SATISFIED</b></div>
+          </div>
+          <p>Frozen criteria + frozen evidence snapshot.</p>
+        </article>
+        <div class="boundary-arrow reveal" aria-hidden="true"><span>VERDICT ONLY</span><i>→</i></div>
+        <article class="money-panel reveal">
+          <p class="panel-label">DETERMINISTIC EXECUTION</p>
+          <div class="fixed-money">
+            <span>STEP 02</span>
+            <strong>0.010 <small>GEN</small></strong>
+            <i>↓</i>
+            <b>RECIPIENT</b>
+          </div>
+          <p>The amount was committed before any model judgment.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="contest landing-section" id="contest">
+      <div class="contest-copy reveal">
+        <p class="kicker">CONTEST PATH</p>
+        <h2>Disagreement<br>has a path.</h2>
+        <p>A payer can contest a provisional completion, but resolution reuses the same frozen evidence snapshot. Neither side swaps in replacement evidence.</p>
+      </div>
+      <div class="contest-sequence reveal">
+        <div class="contest-step current"><span>01</span><b>PROVISIONAL</b><small>Primary review</small></div>
+        <i class="contest-arrow">↓</i>
+        <div class="contest-step"><span>02</span><b>5% BOND</b><small>Exact frozen formula</small></div>
+        <i class="contest-arrow">↓</i>
+        <div class="contest-step snapshot"><span>03</span><b>SAME SNAPSHOT</b><small>Digest unchanged</small></div>
+        <i class="contest-arrow">↓</i>
+        <div class="contest-step"><span>04</span><b>RESOLVE</b><small>Then deterministic settlement</small></div>
+      </div>
+    </section>
+
+    <section class="final-cta landing-section">
+      <div class="final-route" aria-hidden="true"></div>
+      <div class="final-copy reveal">
+        <p class="kicker">FLOWED</p>
+        <h2>Work doesn't wait on trust.</h2>
+        <p>Commit the sequence. Verify progression. Release only what was already agreed.</p>
+        <a class="cta final-button" href="/app">OPEN FLOWED <span>→</span></a>
+      </div>
+      <div class="system-line reveal"><span>GenLayer Studionet · 61999</span><span>On-chain sequential workflows</span></div>
+    </section>
+  </main>
+
+  <script type="module" src="/landing.js"></script>
 </body>
 </html>
