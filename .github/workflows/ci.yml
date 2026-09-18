@@ -81,9 +81,13 @@ jobs:
           test -f dist/landing.js
           test -f dist/styles.css
           test -f dist/app.js
+          test -f dist/wallet-ux.js
           test -f dist/lossless-json.js
           test -f dist/config.js
           grep -F "WORK MOVES." dist/index.html
           grep -F 'href="/app"' dist/index.html
           grep -F 'id="flow-form"' dist/app/index.html
+          grep -F 'data-node-label="4"' dist/index.html
+          grep -F 'id="wallet-menu"' dist/app/index.html
+          grep -F "wallet_switchEthereumChain" dist/wallet-ux.js
           grep -F "0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad" dist/config.js
