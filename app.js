@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/genlayer-js@1.1.8';
+import { parseLosslessJson } from './lossless-json.js';
 import { studionet } from 'https://esm.sh/genlayer-js@1.1.8/chains';
 import { TransactionHashVariant, TransactionStatus } from 'https://esm.sh/genlayer-js@1.1.8/types';
 
@@ -15,7 +16,7 @@ const $$ = (selector) => [...document.querySelectorAll(selector)];
 function parseGen(value) { const raw=String(value).trim(); if(!/^\d+(\.\d{1,18})?$/.test(raw)) throw new Error('GEN amount must have at most 18 decimals.'); const [w,f='']=raw.split('.'); return BigInt(w)*10n**18n+BigInt(f.padEnd(18,'0')); }
 function formatGen(value) { const wei=BigInt(value||0), w=wei/10n**18n, f=(wei%10n**18n).toString().padStart(18,'0').replace(/0+$/,''); return `${w}${f?`.${f}`:''}`; }
 function short(address){return address?`${address.slice(0,6)}…${address.slice(-4)}`:'—';}
-function safeJson(value){return typeof value==='string'?JSON.parse(value):value;}
+function safeJson(value){return parseLosslessJson(value);}
 function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[c]);}
 function toast(message,isError=false){const n=$('#toast');n.textContent=message;n.classList.toggle('error',isError);n.classList.add('show');setTimeout(()=>n.classList.remove('show'),3500);}
 function txStage(stage,detail=''){const p=$('#tx-panel');p.hidden=false;$('#tx-stage').textContent=stage;$('#tx-detail').textContent=detail;}
