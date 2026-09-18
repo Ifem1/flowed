@@ -5,7 +5,7 @@ import pytest
 from gltest.direct import create_address
 
 CONTRACT = "contracts/Flowed.py"
-SDK_VERSION = "v0.6.0-rc5"
+SDK_VERSION = "v0.2.16"
 BASE_TIME = "2026-09-17T20:00:00Z"
 ACCEPT_BY = 1_800_000_000
 STEP = 10**16  # 0.01 GEN

@@ -1,5 +1,5 @@
-# v0.3.0
-# { "Depends": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng" }
+# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
+# v0.2.16
 """Flowed: funded sequential semantic workflows for GenLayer Studionet (61999).
 
 Flowed turns funded work into a sequential semantic state machine: when GenLayer
@@ -10,9 +10,7 @@ import hashlib
 import json
 import re
 import datetime
-from genlayer.storage import TreeMap
-import genlayer as gl
-from genlayer.types import *
+from genlayer import *
 
 MIN_STEPS, MAX_STEPS = 2, 8
 MIN_TTL, MAX_TTL = 300, 30 * 24 * 60 * 60
@@ -42,7 +40,7 @@ def _now() -> int:
     return int(datetime.datetime.fromisoformat(gl.message.raw["datetime"].replace("Z", "+00:00")).timestamp())
 
 
-class Flowed(gl.contract.Contract):
+class Flowed(gl.Contract):
     flows: TreeMap[u256, str]
     next_flow_id: u256
     funded: u256
@@ -188,7 +186,7 @@ class Flowed(gl.contract.Contract):
 
     def _send(self, to, amount):
         assert amount > 0
-        gl.contract.get_at(Address(to)).emit_transfer(value=u256(amount))
+        gl.get_contract_at(Address(to)).emit_transfer(value=amount)
 
     def _snapshot(self, step):
         def fetch():
@@ -196,21 +194,20 @@ class Flowed(gl.contract.Contract):
             required_unavailable = False
             for src in step["sources"]:
                 try:
-                    response = gl.nondet.web.get(src["url"])
-                    status = getattr(response, "status_code", getattr(response, "status", None))
-                    if status is None or status < 200 or status >= 300:
-                        raise gl.vm.UserError("unusable source status")
-                    body = response.body.decode("utf-8", errors="replace") if isinstance(response.body, bytes) else str(response.body)
+                    body = gl.nondet.web.render(src["url"], mode="text")
                     body = body.strip()
                     if not body:
-                        raise gl.vm.UserError("empty source")
+                        if src["required"]:
+                            required_unavailable = True
+                        out.append({"label": src["label"], "url": src["url"], "required": src["required"], "status": "SOURCE_UNAVAILABLE"})
+                        continue
                     out.append({"label": src["label"], "url": src["url"], "required": src["required"], "body": body[:MAX_SOURCE_BODY]})
                 except Exception:
                     if src["required"]:
                         required_unavailable = True
                     out.append({"label": src["label"], "url": src["url"], "required": src["required"], "status": "SOURCE_UNAVAILABLE"})
             return json.dumps({"required_unavailable": required_unavailable, "sources": out}, sort_keys=True, separators=(",", ":"))
-        snapshot = gl.eq_principle.strict_eq(fetch)
+        snapshot = gl.eq_principle_strict_eq(fetch)
         unavailable = json.loads(snapshot).get("required_unavailable", False)
         digest = hashlib.sha256(snapshot.encode()).hexdigest()
         return snapshot, digest, unavailable
@@ -220,7 +217,7 @@ class Flowed(gl.contract.Contract):
         def classify():
             out = gl.nondet.exec_prompt(prompt)
             return out if isinstance(out, str) and out in LABELS else "MODEL_OUTPUT_INVALID"
-        return gl.eq_principle.strict_eq(classify)
+        return gl.eq_principle_strict_eq(classify)
 
     @gl.public.write
     def review_active_step(self, flow_id: u256):

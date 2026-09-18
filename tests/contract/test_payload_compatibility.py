@@ -19,7 +19,7 @@ def test_snapshot_bounds_bodies_before_canonical_serialization():
     assert 'sort_keys=True' in source
     assert 'separators=(",", ":")' in source
     assert 'required_unavailable' in source
-    assert 'snapshot = gl.eq_principle.strict_eq(fetch)' in source
+    assert 'snapshot = gl.eq_principle_strict_eq(fetch)' in source
     assert 'hashlib.sha256(snapshot.encode()).hexdigest()' in source
     assert '))[:' not in source
 
