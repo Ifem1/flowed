@@ -3,7 +3,7 @@ const CONTRACT = '0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad';
 
 async function get(path) {
   const url = `${BASE}/${path}`;
-  const response = await fetch(url, { redirect: 'follow' });
+  const response = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(15000) });
   if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
   const text = await response.text();
   if (!text.trim()) throw new Error(`${url}: empty response`);
@@ -18,6 +18,11 @@ const [index, styles, app, config, lossless] = await Promise.all([
   get('lossless-json.js'),
 ]);
 
+if (!index.contentType.toLowerCase().includes('text/html')) throw new Error(`Live HTML has wrong content type: ${index.contentType}`);
+if (!styles.contentType.toLowerCase().includes('text/css')) throw new Error(`Live CSS has wrong content type: ${styles.contentType}`);
+if (!app.contentType.toLowerCase().includes('javascript')) throw new Error(`Live app JS has wrong content type: ${app.contentType}`);
+if (!config.contentType.toLowerCase().includes('javascript')) throw new Error(`Live config JS has wrong content type: ${config.contentType}`);
+if (!lossless.contentType.toLowerCase().includes('javascript')) throw new Error(`Live lossless JS has wrong content type: ${lossless.contentType}`);
 if (!index.text.includes('Work moves. Money follows.')) throw new Error('Live HTML missing Flowed identity');
 if (!config.text.includes(CONTRACT)) throw new Error('Live config missing canonical contract');
 if (!config.text.includes('chainId: 61999')) throw new Error('Live config missing Studionet chain 61999');
@@ -40,7 +45,7 @@ if (/private\s*key|private_key|FLOWED_PRIVATE_KEY/i.test(app.text + index.text))
 console.log(JSON.stringify({
   status: 'PASS',
   liveFrontend: index.url,
-  sourceCommit: '5f4641dc0d1dd3f5348a3be05749105470418e4f',
+  sourceCommit: 'd2016d4d2a164fc557caaaa83aafdd40bf68129b',
   contract: CONTRACT,
   chainId: 61999,
   resources: {
