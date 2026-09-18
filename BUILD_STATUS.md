@@ -15,8 +15,7 @@
 
 ## Application
 
-- Live frontend: https://cdn.statically.io/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
-- Frontend source snapshot: `d2016d4d2a164fc557caaaa83aafdd40bf68129b`
+- Production frontend: ⏳ Vercel deployment pending
 - Canonical contract wired in `config.js`: ✅
 - Production build defaults to and enforces the canonical contract: ✅
 - Public reads without wallet: ✅
@@ -28,7 +27,7 @@
 - FINALIZED success verification, including stable Studio leader receipt: ✅
 - Flow list/detail/create/dashboard/history/accounting UI: ✅
 - Fake/mock Flow fallback: none
-- Public production resources and canonical config: ✅ checked by `scripts/verify_live_frontend.mjs`
+- Post-deploy Vercel resource/config verifier: ✅ ready (`scripts/verify_live_frontend.mjs`)
 
 ## Verification and CI
 
@@ -36,7 +35,7 @@
 - Contract static / GenVM lint / SDK validation: ✅
 - Frontend lint/typecheck/tests/build: ✅
 - Canonical live Studionet verification: ✅
-- Live frontend HTTP/config verification: ✅
+- Live frontend HTTP/config verification: ⏳ runs after Vercel deployment
 - Direct Mode: ⚠️ **documented stable-runtime harness limitation**, not a PASS. The pinned harness raises `DecodingError: unexpected end of memory` while importing the v0.2.16 SDK before Flowed executes. Preserved tests remain diagnostic.
 
 ## Canonical 3-step demonstration
