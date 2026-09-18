@@ -1,4 +1,4 @@
-const BASE = 'https://rawcdn.githack.com/Ifem1/flowed/6ec9f1dc880c0c18c05ebbad2044570fa3eac511';
+const BASE = 'https://rawcdn.githack.com/Ifem1/flowed/d2016d4d2a164fc557caaaa83aafdd40bf68129b';
 const CONTRACT = '0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad';
 
 async function get(path) {
