@@ -24,13 +24,23 @@ Flowed is already deployed. Do **not** redeploy or modify `contracts/Flowed.py`.
 
 ## Production frontend
 
-Live app:
+The production frontend is intended for Vercel.
 
-https://cdn.statically.io/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
+Repository deployment settings are fixed in `vercel.json`:
 
-The frontend is a commit-pinned static production snapshot sourced from `d2016d4d2a164fc557caaaa83aafdd40bf68129b`. It contains the canonical Flowed address and cannot silently drift when later documentation commits land.
+- build command: `npm run build`
+- output directory: `dist`
+- framework preset: none/static
 
-`scripts/verify_live_frontend.mjs` fetches the public HTML/CSS/JS/config resources and verifies the Flowed identity, canonical contract, chain `61999`, canonical RPC, public-read/write surface, wrong-network handling, finalized handling, absence of `FLOWED_LIVE_FLOWS`, and absence of browser private-key UI.
+The build defaults to the canonical Flowed contract and rejects any different `FLOWED_CONTRACT_ADDRESS`.
+
+Deploy the current `master` branch in Vercel, then verify the resulting URL:
+
+```bash
+FLOWED_LIVE_FRONTEND=https://<your-vercel-domain> node scripts/verify_live_frontend.mjs
+```
+
+Only after that verifier passes should the Vercel URL be recorded as the canonical live frontend.
 
 ## Canonical live demo payload
 
