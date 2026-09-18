@@ -2,8 +2,11 @@ import { cp, mkdir, writeFile } from 'node:fs/promises';
 
 const CANONICAL_CONTRACT = '0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad';
 
-await mkdir('dist', { recursive: true });
-for (const file of ['index.html', 'styles.css', 'app.js', 'lossless-json.js']) await cp(file, `dist/${file}`);
+await mkdir('dist/app', { recursive: true });
+for (const file of ['index.html', 'landing.css', 'landing.js', 'styles.css', 'app.js', 'lossless-json.js']) {
+  await cp(file, `dist/${file}`);
+}
+await cp('app/index.html', 'dist/app/index.html');
 
 const address = (process.env.FLOWED_CONTRACT_ADDRESS || CANONICAL_CONTRACT).trim();
 if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
@@ -23,4 +26,4 @@ await writeFile(
   })});\n`,
 );
 
-console.log(`static production build: PASS (canonical contract ${address})`);
+console.log(`static production build: PASS (landing / + operational /app + canonical contract ${address})`);
