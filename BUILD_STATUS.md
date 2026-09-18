@@ -15,14 +15,15 @@
 
 ## Application
 
-- Live frontend: https://rawcdn.githack.com/Ifem1/flowed/5f4641dc0d1dd3f5348a3be05749105470418e4f/index.html
-- Frontend source snapshot: `5f4641dc0d1dd3f5348a3be05749105470418e4f`
+- Live frontend: https://rawcdn.githack.com/Ifem1/flowed/6ec9f1dc880c0c18c05ebbad2044570fa3eac511/index.html
+- Frontend source snapshot: `6ec9f1dc880c0c18c05ebbad2044570fa3eac511`
 - Canonical contract wired in `config.js`: ✅
 - Production build defaults to and enforces the canonical contract: ✅
 - Public reads without wallet: ✅
 - Injected wallet only / no browser private key: ✅
 - Wrong-network detection and Studionet switch request: ✅
 - Exact `BigInt` GEN handling: ✅
+- Lossless contract JSON integer parsing: ✅
 - Full production write surface: ✅
 - FINALIZED success verification, including stable Studio leader receipt: ✅
 - Flow list/detail/create/dashboard/history/accounting UI: ✅
