@@ -1,6 +1,6 @@
 import { createClient, isSuccessful } from 'https://esm.sh/genlayer-js@1.1.8';
 import { studionet } from 'https://esm.sh/genlayer-js@1.1.8/chains';
-import { ExecutionResult, TransactionHashVariant, TransactionStatus } from 'https://esm.sh/genlayer-js@1.1.8/types';
+import { TransactionHashVariant, TransactionStatus } from 'https://esm.sh/genlayer-js@1.1.8/types';
 
 const CHAIN_ID = 61999;
 const CHAIN_HEX = '0xf22f';
