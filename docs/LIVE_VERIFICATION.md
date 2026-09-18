@@ -48,18 +48,27 @@ The probe is runtime evidence only. It is **not** the Flowed production contract
 
 ## Production frontend
 
-- Live frontend: https://cdn.statically.io/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
-- Frontend source snapshot: `d2016d4d2a164fc557caaaa83aafdd40bf68129b`
+The final frontend will be deployed to Vercel from this repository. No temporary CDN is treated as the canonical production app.
+
+Pre-deploy verification:
 - Canonical contract configured: **PASS**
 - Studionet `61999` configured: **PASS**
 - Public read surface present: **PASS**
-- Injected wallet/write surface present: **PASS**
+- Full write surface present: **PASS**
+- Injected wallet only / no browser private key: **PASS**
 - Wrong-network switch handling present: **PASS**
-- Finalized handling present: **PASS**
+- FINALIZED-success handling present: **PASS**
+- Lossless on-chain JSON integer parsing present: **PASS**
 - Fake `FLOWED_LIVE_FLOWS` fallback absent: **PASS**
-- Browser private-key UI absent: **PASS**
+- Vercel configuration present: **PASS**
 
-The public resources are fetched and checked by `scripts/verify_live_frontend.mjs` in the canonical-live GitHub Actions workflow.
+After deployment, run:
+
+```bash
+FLOWED_LIVE_FRONTEND=https://<your-vercel-domain> node scripts/verify_live_frontend.mjs
+```
+
+The verified Vercel URL will be recorded here only after that command passes.
 
 ## Canonical 3-step Flow
 
