@@ -1,6 +1,6 @@
 import { createClient, isSuccessful } from 'genlayer-js';
 import { studionet } from 'genlayer-js/chains';
-import { ExecutionResult, TransactionStatus, TransactionHashVariant } from 'genlayer-js/types';
+import { TransactionStatus, TransactionHashVariant } from 'genlayer-js/types';
 import type { CalldataEncodable, Hash } from 'genlayer-js/types';
 import type { Address } from 'viem';
 import type { CreateFlowPayload } from './protocol';
