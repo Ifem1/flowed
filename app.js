@@ -19,7 +19,7 @@ function safeJson(value){return typeof value==='string'?JSON.parse(value):value;
 function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[c]);}
 function toast(message,isError=false){const n=$('#toast');n.textContent=message;n.classList.toggle('error',isError);n.classList.add('show');setTimeout(()=>n.classList.remove('show'),3500);}
 function txStage(stage,detail=''){const p=$('#tx-panel');p.hidden=false;$('#tx-stage').textContent=stage;$('#tx-detail').textContent=detail;}
-function finalizedSuccess(receipt){return (receipt?.statusName==='FINALIZED'||Number(receipt?.status)===7)&&(receipt?.txExecutionResultName==='FINISHED_WITH_RETURN'||Number(receipt?.txExecutionResult)===1);}
+function finalizedSuccess(receipt){const leaders=Array.isArray(receipt?.consensus_data?.leader_receipt)?receipt.consensus_data.leader_receipt:(receipt?.consensus_data?.leader_receipt?[receipt.consensus_data.leader_receipt]:[]);const executionOk=receipt?.txExecutionResultName==='FINISHED_WITH_RETURN'||Number(receipt?.txExecutionResult)===1||leaders.some(x=>x?.execution_result==='SUCCESS');return (receipt?.statusName==='FINALIZED'||Number(receipt?.status)===7)&&executionOk;}
 function clearTx(){setTimeout(()=>{$('#tx-panel').hidden=true;},1800);}
 function ensureContract(){if(!/^0x[a-fA-F0-9]{40}$/.test(CONTRACT))throw new Error('Canonical contract is not configured yet.');}
 async function read(functionName,args=[]){ensureContract();return readClient.readContract({address:CONTRACT,functionName,args,transactionHashVariant:TransactionHashVariant.LATEST_FINAL});}
