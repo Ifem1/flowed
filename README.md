@@ -8,12 +8,13 @@ Flowed is a funded sequential semantic workflow. One payer funds an entire 2–8
 
 ## Canonical production
 
-- Live app: **production build ready; GitHub Pages repository enablement is required before the prepared deployment workflow can publish it**
+- Live app: https://rawcdn.githack.com/Ifem1/flowed/5f4641dc0d1dd3f5348a3be05749105470418e4f/index.html
+- Live frontend source snapshot: `5f4641dc0d1dd3f5348a3be05749105470418e4f`
 - Canonical contract: `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`
 - Network: **GenLayer Studionet**
 - Chain ID: `61999`
 - RPC: `https://studio.genlayer.com/api`
-- Explorer: `https://explorer-studio.genlayer.com`
+- Explorer: `https://explorer-studio.genlayer.com/address/0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`
 - Canonical deployed source commit: `c628a86951d59de4c774d89cb4c8ae5cbb1e4e47`
 - Canonical source SHA-256: `0aac468a81efe683798271e0c38c6e582eeef515386bb8e4a1d8eed8defd72b4`
 - Canonical `contracts/Flowed.py` Git blob: `b8c351464cf876fedb1c1b0312670a1a4d693b5b`
@@ -21,7 +22,7 @@ Flowed is a funded sequential semantic workflow. One payer funds an entire 2–8
 - Runtime: `v0.2.16`
 - Runner: `py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6`
 
-The canonical deployment has been independently re-read from Studionet: the deployment transaction is `FINALIZED`, the stable Studio leader receipt reports `SUCCESS`, `get_flow_count()` is currently `0`, global accounting is all zero, and both accounting invariants hold. The deployed `contracts/Flowed.py` is frozen and must not be modified or redeployed.
+The canonical deployment is independently re-read from Studionet on every repository push. The deployment transaction is `FINALIZED`, the stable Studio leader receipt reports `SUCCESS`, and finalized public reads verify global escrow and bond accounting. The deployed `contracts/Flowed.py` is frozen and must not be modified or redeployed.
 
 ## What is implemented
 
@@ -35,9 +36,10 @@ The canonical deployment has been independently re-read from Studionet: the depl
 - injected EIP-1193 wallet writes only; no private-key UI
 - Studionet `61999` network detection/switching
 - exact `BigInt` GEN parsing and write construction
-- finalized-success verification that supports the stable Studio v0.2.16 leader receipt shape
+- finalized-success verification that supports the stable Studio v0.2.16 receipt shape
 - real Flow list, detail, dashboard, create-flow, manifests/history, accounting, actions, and transaction lifecycle UI
-- canonical production build configuration; no fake Flow fallback and no fake transaction success
+- canonical production configuration; no fake Flow fallback and no fake transaction success
+- public commit-pinned production frontend with automated HTTP/config verification
 
 ## Verification
 
@@ -55,12 +57,13 @@ npm run build
 
 node scripts/deploy_preflight.mjs
 node scripts/verify_canonical_live.mjs
+node scripts/verify_live_frontend.mjs
 ```
 
-The preserved Direct Mode suite is diagnostic on the stable v0.2.16 runtime. The pinned local harness fails while decoding the runtime message during import with `DecodingError: unexpected end of memory`; it does not reach Flowed contract execution. CI records that limitation without falsely calling it a Direct Mode pass. Real finalized Studionet execution is the authoritative runtime evidence.
+The preserved Direct Mode suite is diagnostic on the stable v0.2.16 runtime. The pinned local harness fails while decoding the runtime message during import with `DecodingError: unexpected end of memory`; it does not reach Flowed contract execution. CI records that limitation without presenting it as a Direct Mode pass. Finalized Studionet execution is the authoritative stable-runtime evidence.
 
-## Remaining external execution
+## Live protocol proof
 
-The repository-side implementation, canonical wiring, canonical live read verification, immutable demo evidence, and deployment workflow are prepared. Publishing the frontend requires repository Pages enablement (or a connected external deployment provider), and the canonical 3-step demonstration requires signatures from real payer/recipient wallets. Those signed live transactions are not fabricated in this repository.
+The immutable three-step evidence and exact demo payload are prepared. The only unexecuted proof is the funded 0.03 GEN lifecycle itself because its create/accept/review/contest/finalize writes require real payer/recipient wallet signatures. No Flow ID, lifecycle hash, semantic label, snapshot digest, or final accounting is fabricated before those finalized transactions exist.
 
 See `BUILD_STATUS.md`, `SUBMISSION.md`, `docs/DEPLOYMENT.md`, and `docs/LIVE_VERIFICATION.md`.
