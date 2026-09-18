@@ -1,8 +1,6 @@
 name: Flowed Frontend Production
 
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
 
 permissions:
