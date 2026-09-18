@@ -37,7 +37,16 @@ def _valid_url(url: str) -> bool:
 
 
 def _now() -> int:
-    return int(datetime.datetime.fromisoformat(gl.message.raw["datetime"].replace("Z", "+00:00")).timestamp())
+    return int(datetime.datetime.fromisoformat(gl.message_raw["datetime"]).timestamp())
+
+
+@gl.evm.contract_interface
+class _Recipient:
+    class View:
+        pass
+
+    class Write:
+        pass
 
 
 class Flowed(gl.Contract):
@@ -186,7 +195,7 @@ class Flowed(gl.Contract):
 
     def _send(self, to, amount):
         assert amount > 0
-        gl.get_contract_at(Address(to)).emit_transfer(value=amount)
+        _Recipient(Address(to)).emit_transfer(value=u256(amount))
 
     def _snapshot(self, step):
         def fetch():

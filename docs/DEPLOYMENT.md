@@ -7,7 +7,8 @@
 - RPC: `https://studio.genlayer.com/api`
 - Explorer: `https://explorer-studio.genlayer.com`
 - Production source: `contracts/Flowed.py`
-- GenVM contract layout: `v0.3.0`
+- GenVM contract layout: `v0.2.16`
+- Depends runner: `py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6`
 - Constructor arguments: none
 - Constructor value: `0 GEN`
 

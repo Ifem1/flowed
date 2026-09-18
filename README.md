@@ -22,7 +22,7 @@ Flowed is a funded sequential semantic workflow. One payer funds an entire 2–8
 - contest reuse of the stored primary snapshot without refetch or evidence injection
 - one-scalar semantic verdict boundary
 - finalized GEN transfers using the supported GenLayer contract transfer mechanism
-- genuine Linux Direct Mode executing the actual production `Flowed.py`
+- stable-runtime port of the actual production `Flowed.py`, with real Studionet probe proof; the pinned Direct Mode harness limitation is documented in `BUILD_STATUS.md`
 - contract/protocol test suite and GenVM lint/SDK validation in GitHub Actions
 - live browser reads through `genlayer-js` without wallet connection
 - injected-wallet writes with Studionet enforcement and finalized receipt checking
