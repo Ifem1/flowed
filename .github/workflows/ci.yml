@@ -31,7 +31,6 @@ jobs:
   direct-mode:
     name: direct-mode-diagnostic
     runs-on: ubuntu-24.04
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -45,6 +44,7 @@ jobs:
             https://github.com/genlayerlabs/genvm/releases/download/v0.2.16/genvm-universal.tar.xz \
             --output "$HOME/.cache/gltest-direct/genvm-universal-v0.2.16.tar.xz"
       - name: Execute preserved Flowed.py Direct Mode tests
+        continue-on-error: true
         run: python -m pytest tests/direct -q
 
   deployment-preflight:
