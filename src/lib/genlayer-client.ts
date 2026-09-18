@@ -67,7 +67,7 @@ export function abandonFlow(client: WalletClient, address: Address, flowId: bigi
 export function expireActiveFlow(client: WalletClient, address: Address, flowId: bigint) { return write(client, address, 'expire_active_flow', [flowId]); }
 
 export async function waitForFinalizedSuccess(client: ReturnType<typeof createReadClient>, hash: Hash) {
-  const receipt = await client.waitForTransactionReceipt({ hash, status: TransactionStatus.FINALIZED, fullTransaction: true });
+  const receipt = await client.waitForTransactionReceipt({ hash, status: TransactionStatus.FINALIZED, fullTransaction: true } as any);
   const finalized =
     receipt.statusName === TransactionStatus.FINALIZED || Number(receipt.status) === 7;
   const leaderReceiptRaw = (receipt as any).consensus_data?.leader_receipt;
