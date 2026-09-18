@@ -16,8 +16,8 @@ Flowed turns funded work into a sequential semantic state machine: when GenLayer
 
 ## Live application
 
-- production frontend: https://rawcdn.githack.com/Ifem1/flowed/5f4641dc0d1dd3f5348a3be05749105470418e4f/index.html
-- frontend source snapshot: `5f4641dc0d1dd3f5348a3be05749105470418e4f`
+- production frontend: https://rawcdn.githack.com/Ifem1/flowed/6ec9f1dc880c0c18c05ebbad2044570fa3eac511/index.html
+- frontend source snapshot: `6ec9f1dc880c0c18c05ebbad2044570fa3eac511`
 - public resources/config verified automatically from the live URL
 - canonical contract and Studionet 61999 are hard-wired in production config
 - finalized public reads work without wallet
