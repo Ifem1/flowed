@@ -7,7 +7,7 @@ Flowed is already deployed. Do **not** redeploy or modify `contracts/Flowed.py`.
 - Network: **GenLayer Studionet**
 - Chain ID: **61999**
 - RPC: `https://studio.genlayer.com/api`
-- Explorer: `https://explorer-studio.genlayer.com`
+- Explorer: `https://explorer-studio.genlayer.com/address/0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`
 - Canonical contract: `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`
 - Canonical deployed source commit: `c628a86951d59de4c774d89cb4c8ae5cbb1e4e47`
 - Source SHA-256: `0aac468a81efe683798271e0c38c6e582eeef515386bb8e4a1d8eed8defd72b4`
@@ -18,25 +18,19 @@ Flowed is already deployed. Do **not** redeploy or modify `contracts/Flowed.py`.
 - Constructor arguments: none
 - Constructor value: `0 GEN`
 
-`scripts/deploy_preflight.mjs` now acts as a post-deployment source/chain guard. It fails if the local production source no longer matches the canonical deployed SHA-256/Git blob or if the configured RPC is not chain `61999`.
+`scripts/deploy_preflight.mjs` is a post-deployment source/chain guard. It fails if the local production source no longer matches the canonical deployed SHA-256/Git blob or if the configured RPC is not chain `61999`.
 
-`scripts/verify_canonical_live.mjs` independently verifies the canonical deployment transaction reaches `FINALIZED`, checks successful stable Studio leader execution, reads the canonical contract at `LATEST_FINAL`, and verifies the global accounting equations.
+`scripts/verify_canonical_live.mjs` independently verifies the canonical deployment transaction reaches `FINALIZED`, checks stable Studio leader execution, reads the canonical contract at `LATEST_FINAL`, and verifies global accounting equations.
 
-## Frontend production deployment
+## Production frontend
 
-The static build is canonical by default:
+Live app:
 
-```bash
-npm ci
-npm run lint
-npm run typecheck
-npm test
-npm run build
-```
+https://rawcdn.githack.com/Ifem1/flowed/5f4641dc0d1dd3f5348a3be05749105470418e4f/index.html
 
-`scripts/build.mjs` rejects any configured production address other than `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`.
+The frontend is a commit-pinned static production snapshot sourced from `5f4641dc0d1dd3f5348a3be05749105470418e4f`. It contains the canonical Flowed address and cannot silently drift when later documentation commits land.
 
-A GitHub Pages production workflow is staged at `.github/workflows/pages.yml`. It is manual-only so repository commits are not marked failed while Pages is disabled. Before running it, an administrator must enable **Settings → Pages → Build and deployment → Source: GitHub Actions**. Once enabled, run the **Flowed Frontend Production** workflow and record its emitted `page_url`.
+`scripts/verify_live_frontend.mjs` fetches the public HTML/CSS/JS/config resources and verifies the Flowed identity, canonical contract, chain `61999`, canonical RPC, public-read/write surface, wrong-network handling, finalized handling, absence of `FLOWED_LIVE_FLOWS`, and absence of browser private-key UI.
 
 ## Canonical live demo payload
 
@@ -47,7 +41,7 @@ Use exactly three steps and total escrow `0.03 GEN`:
 - step-2 contest bond: `0.0005 GEN` = `500000000000000` wei
 - contest window: `60` seconds
 - recommended step TTL: `3600` seconds
-- acceptance deadline: choose a future Unix timestamp when the payer signs
+- acceptance deadline: a future timestamp when the payer signs
 
 Frozen criteria and immutable sources:
 
@@ -64,9 +58,9 @@ The payer and recipient must be distinct real wallet addresses. Never paste a pr
 
 1. payer creates the Flow with exactly `0.03 GEN`
 2. recipient accepts
-3. recipient reviews step 1; after `SATISFIED` and the contest window, permissionlessly finalize
+3. recipient reviews step 1; after `SATISFIED` and the 60-second contest window, permissionlessly finalize
 4. recipient reviews step 2; payer contests with exactly `0.0005 GEN`; resolve against the same stored snapshot
-5. recipient reviews step 3; after `SATISFIED` and the contest window, permissionlessly finalize
-6. read per-Flow and global accounting from the contract and record only finalized observed values
+5. recipient reviews step 3; after `SATISFIED` and the 60-second contest window, permissionlessly finalize
+6. read per-Flow and global accounting and record only finalized observed values
 
-Use `scripts/live_full.mjs` to re-read finalized state and supplied finalized transaction hashes after the signed lifecycle exists.
+Use `scripts/live_full.mjs` to re-read finalized state and supplied transaction hashes after the signed lifecycle exists.
