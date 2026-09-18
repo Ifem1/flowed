@@ -8,8 +8,7 @@ Flowed is a funded sequential semantic workflow. One payer funds an entire 2–8
 
 ## Canonical production
 
-- Live app: https://cdn.statically.io/gh/Ifem1/flowed@d2016d4d2a164fc557caaaa83aafdd40bf68129b/index.html
-- Live frontend source snapshot: `d2016d4d2a164fc557caaaa83aafdd40bf68129b`
+- Production frontend: **Vercel deployment pending**
 - Canonical contract: `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`
 - Network: **GenLayer Studionet**
 - Chain ID: `61999`
@@ -40,7 +39,7 @@ The canonical deployment is independently re-read from Studionet on every reposi
 - finalized-success verification that supports the stable Studio v0.2.16 receipt shape
 - real Flow list, detail, dashboard, create-flow, manifests/history, accounting, actions, and transaction lifecycle UI
 - canonical production configuration; no fake Flow fallback and no fake transaction success
-- public commit-pinned production frontend with automated HTTP/config verification
+- Vercel-ready static production build with post-deploy HTTP/config verification
 
 ## Verification
 
@@ -58,7 +57,7 @@ npm run build
 
 node scripts/deploy_preflight.mjs
 node scripts/verify_canonical_live.mjs
-node scripts/verify_live_frontend.mjs
+FLOWED_LIVE_FRONTEND=https://<your-vercel-domain> node scripts/verify_live_frontend.mjs
 ```
 
 The preserved Direct Mode suite is diagnostic on the stable v0.2.16 runtime. The pinned local harness fails while decoding the runtime message during import with `DecodingError: unexpected end of memory`; it does not reach Flowed contract execution. CI records that limitation without presenting it as a Direct Mode pass. Finalized Studionet execution is the authoritative stable-runtime evidence.
