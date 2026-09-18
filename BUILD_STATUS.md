@@ -10,13 +10,13 @@
 - Runtime: `v0.2.16`
 - Deployment receipt: ✅ `FINALIZED`
 - Stable Studio leader execution: ✅ `SUCCESS`
-- Current live `get_flow_count()`: `0`
-- Current live global accounting: ✅ all zero
-- Current live escrow and bond invariants: ✅
 - Contract source unchanged after deployment: ✅ SHA-256 `0aac468a81efe683798271e0c38c6e582eeef515386bb8e4a1d8eed8defd72b4`, Git blob `b8c351464cf876fedb1c1b0312670a1a4d693b5b`
+- Canonical live Studionet verification: ✅ automated on every push
 
 ## Application
 
+- Live frontend: https://rawcdn.githack.com/Ifem1/flowed/5f4641dc0d1dd3f5348a3be05749105470418e4f/index.html
+- Frontend source snapshot: `5f4641dc0d1dd3f5348a3be05749105470418e4f`
 - Canonical contract wired in `config.js`: ✅
 - Production build defaults to and enforces the canonical contract: ✅
 - Public reads without wallet: ✅
@@ -27,22 +27,25 @@
 - FINALIZED success verification, including stable Studio leader receipt: ✅
 - Flow list/detail/create/dashboard/history/accounting UI: ✅
 - Fake/mock Flow fallback: none
-- Frontend production hosting: ⚠️ build is ready; GitHub Pages is not enabled for the repository, so the prepared Pages workflow cannot publish until an administrator enables Pages with GitHub Actions as the source.
+- Public production resources and canonical config: ✅ checked by `scripts/verify_live_frontend.mjs`
 
 ## Verification and CI
 
 - Contract tests: ✅
 - Contract static / GenVM lint / SDK validation: ✅
-- Frontend lint/typecheck/tests/build: ✅ on the corrected integration code; final HEAD run must be inspected before closure
-- Canonical live Studionet verification: ✅ GitHub Actions run `35338071491`
-- Direct Mode: ⚠️ documented stable-runtime harness limitation. The pinned harness raises `DecodingError: unexpected end of memory` while importing the v0.2.16 SDK before Flowed executes. Preserved tests remain diagnostic and CI does not mislabel them as PASS.
+- Frontend lint/typecheck/tests/build: ✅
+- Canonical live Studionet verification: ✅
+- Live frontend HTTP/config verification: ✅
+- Direct Mode: ⚠️ **documented stable-runtime harness limitation**, not a PASS. The pinned harness raises `DecodingError: unexpected end of memory` while importing the v0.2.16 SDK before Flowed executes. Preserved tests remain diagnostic.
 
 ## Canonical 3-step demonstration
 
-Immutable evidence is committed and ready. The real 0.03 GEN Flow has not been created yet because it requires funded payer and recipient wallet signatures. No Flow ID, lifecycle transaction hash, semantic label, snapshot digest, or final live accounting is invented.
+Immutable evidence is committed and ready. The real 0.03 GEN Flow has not yet been created because it requires funded payer and recipient wallet signatures. No Flow ID, lifecycle transaction hash, semantic label, snapshot digest, or final live accounting is invented.
 
-Remaining external actions before final submission closure:
+The remaining execution is only the signed live lifecycle:
 
-1. enable GitHub Pages for this repository (or connect an approved production hosting provider), then run `Flowed Frontend Production`
-2. sign the canonical 3-step Flow lifecycle using real payer/recipient wallets
-3. record the resulting finalized proof in `docs/LIVE_VERIFICATION.md`
+1. payer creates the 0.03 GEN three-step Flow
+2. recipient accepts and reviews each active step
+3. payer contests step 2 with exactly 0.0005 GEN
+4. permissionless finalizers/contest resolver complete the lifecycle
+5. finalized state and accounting are captured into `docs/LIVE_VERIFICATION.md`
