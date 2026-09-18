@@ -44,7 +44,8 @@ jobs:
             https://github.com/genlayerlabs/genvm/releases/download/v0.2.16/genvm-universal.tar.xz \
             --output "$HOME/.cache/gltest-direct/genvm-universal-v0.2.16.tar.xz"
       - name: Execute actual Flowed.py in Direct Mode (diagnostic on stable v0.2.16)
-        run: python -m pytest tests/direct -q || echo "KNOWN LIMITATION: pinned Direct Mode harness cannot decode the stable v0.2.16 message format; see BUILD_STATUS.md"
+        run: |
+          python -m pytest tests/direct -q || echo "KNOWN LIMITATION: pinned Direct Mode harness cannot decode the stable v0.2.16 message format; see BUILD_STATUS.md"
 
   deployment-preflight:
     name: studionet-deployment-preflight
