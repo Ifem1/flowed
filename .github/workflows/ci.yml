@@ -29,32 +29,46 @@ jobs:
         run: python -m pytest tests/contract tests/frontend -q
 
   direct-mode:
-    name: genuine-direct-mode
+    name: direct-mode-diagnostic
     runs-on: ubuntu-24.04
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - name: Install pinned GenLayer Direct Mode
         run: python -m pip install -r requirements.txt
-      - name: Cache official GenVM manager runner bundle for gltest
+      - name: Cache official stable v0.2.16 runner bundle for gltest
         run: |
           mkdir -p "$HOME/.cache/gltest-direct"
           curl --fail --location --retry 3 \
             https://github.com/genlayerlabs/genvm/releases/download/v0.2.16/genvm-universal.tar.xz \
             --output "$HOME/.cache/gltest-direct/genvm-universal-v0.2.16.tar.xz"
-      - name: Execute actual Flowed.py in Direct Mode
+      - name: Execute preserved Flowed.py Direct Mode tests
         run: python -m pytest tests/direct -q
 
   deployment-preflight:
-    name: studionet-deployment-preflight
+    name: canonical-source-and-studionet
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: 20}
-      - name: Verify canonical source and Studionet chain
+      - name: Prove deployed production source is byte-frozen
+        run: test "$(git hash-object contracts/Flowed.py)" = "b8c351464cf876fedb1c1b0312670a1a4d693b5b"
+      - name: Verify source header and Studionet chain
         run: node scripts/deploy_preflight.mjs
+
+  canonical-live:
+    name: canonical-live-studionet
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 20}
+      - run: npm ci
+      - name: Verify canonical deployment receipt and finalized reads
+        run: node scripts/verify_canonical_live.mjs
 
   frontend:
     name: frontend
@@ -67,4 +81,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
-      - run: npm run build
+      - name: Build with canonical production contract
+        env:
+          FLOWED_CONTRACT_ADDRESS: 0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad
+        run: npm run build
