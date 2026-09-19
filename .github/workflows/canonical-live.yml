@@ -15,7 +15,13 @@ jobs:
       - run: npm ci
       - name: Verify canonical Studionet deployment and finalized reads
         run: node scripts/verify_canonical_live.mjs
-      - name: Verify Phase 1 production Vercel deployment
+      - name: Verify canonical Flow 2 contest evidence
+        env:
+          FLOWED_FLOW_ID: "2"
+          FLOWED_EXPECT_CANONICAL_DEMO: "1"
+          FLOWED_TX_HASHES: "0x7b5dbc1ab1df332f20a897bed45288a21405053df2a7ffeb82dafa70c71c0b8e,0x6b193d6312fc4b482646eace05d4473231b90a2bc89637a3ea9aed926f79a120,0xc639056ca6f54a53e8f639d1fb779cae1900fb72e2f6fb750609ada56448b359,0xa96b53858fa5f3e3461ab9afa11c46722105f7d0478f278d2e0c4bd386107cad,0x0e42e9463eba647b404a52a16ae44a3d2dda9a9cff14debc01c6c657c27686b4,0xe39a1ba4061ea49d320c10c838ea8c7396dae233317304a58452c92332980125,0x599d6f1e695201d041f272b9d430d0cec384ad8d790e590e07336f500803e721,0x45a816b8c1a96b356984b692674cab6ba1eb5212e4b308dc350c8e1b05c88ce6,0x06b2ec62f28dc79b41039d324d00e54554a1913c4b0c7ea69b4fa31ff591f7fc"
+        run: node scripts/live_full.mjs
+      - name: Verify production Vercel deployment
         env:
           FLOWED_LIVE_FRONTEND: https://flowed-eight.vercel.app
           FLOWED_FRONTEND_RETRIES: 24
