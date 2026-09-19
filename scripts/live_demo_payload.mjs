@@ -12,7 +12,7 @@ if (PAYER) {
 const AMOUNT = 10_000_000_000_000_000n;
 const TOTAL = AMOUNT * 3n;
 const BOND = AMOUNT / 20n;
-const CONTEST_WINDOW = 60n;
+const CONTEST_WINDOW = 600n;
 const TTL = 3600;
 const acceptBy = BigInt(Math.floor(Date.now() / 1000) + 3600);
 const evidenceCommit = 'eb7cfea7fa192517186334a900dba33ee6a70dd9';
@@ -31,8 +31,8 @@ const steps = [1, 2, 3].map((n) => ({
 
 const payload = {
   recipient: RECIPIENT,
-  title: 'Flowed canonical 3-step verification',
-  summary: 'Canonical live verification of funded sequential semantic workflow execution on GenLayer Studionet.',
+  title: 'Flowed canonical contest verification',
+  summary: 'Canonical three-step Flowed lifecycle proving funded sequential progression, semantic verification, deterministic tranche release and same-snapshot contest resolution.',
   accept_by: acceptBy.toString(),
   contest_window_seconds: CONTEST_WINDOW.toString(),
   escrow_amount: TOTAL.toString(),
