@@ -8,44 +8,80 @@
 - Deployment tx: `0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a`
 - Network: GenLayer Studionet `61999`
 - Runtime: `v0.2.16`
-- Deployment receipt: ✅ `FINALIZED`
-- Stable Studio leader execution: ✅ `SUCCESS`
-- Contract source unchanged after deployment: ✅ SHA-256 `0aac468a81efe683798271e0c38c6e582eeef515386bb8e4a1d8eed8defd72b4`, Git blob `b8c351464cf876fedb1c1b0312670a1a4d693b5b`
-- Canonical live Studionet verification: ✅ automated on every push
+- Contract Git blob: ✅ `b8c351464cf876fedb1c1b0312670a1a4d693b5b`
+- Deployment receipt: ✅ FINALIZED
+- Stable Studio leader execution: ✅ SUCCESS
+- Canonical live verification: ✅
 
 ## Application
 
-- Production frontend: ⏳ Vercel deployment pending
-- Canonical contract wired in `config.js`: ✅
-- Production build defaults to and enforces the canonical contract: ✅
-- Public reads without wallet: ✅
-- Injected wallet only / no browser private key: ✅
-- Wrong-network detection and Studionet switch request: ✅
+- Production frontend: ✅ https://flowed-eight.vercel.app/
+- Operational app: ✅ https://flowed-eight.vercel.app/app
+- Public finalized reads without wallet: ✅
+- Flow 1 visible: ✅
+- Flow 2 visible: ✅
+- Injected EIP-1193 wallet only: ✅
+- Flowed-local disconnect: ✅
+- Wrong-chain detection and Studionet switch: ✅
+- 4902 add-network fallback: ✅
 - Exact `BigInt` GEN handling: ✅
-- Lossless contract JSON integer parsing: ✅
-- Full production write surface: ✅
-- FINALIZED success verification, including stable Studio leader receipt: ✅
-- Flow list/detail/create/dashboard/history/accounting UI: ✅
+- Lossless on-chain JSON integer parsing: ✅
+- Full write surface: ✅
+- FINALIZED-success handling: ✅
 - Fake/mock Flow fallback: none
-- Post-deploy Vercel resource/config verifier: ✅ ready (`scripts/verify_live_frontend.mjs`)
+
+## Live protocol proof
+
+### Flow 1 — normal-path historical proof
+
+- state: ✅ COMPLETED
+- funded: `0.03 GEN`
+- released: `0.03 GEN`
+- refunded: `0`
+- remaining: `0`
+- bonds: all zero
+- three primary semantic reviews: ✅ SATISFIED
+- ordinary no-contest finalization: ✅
+- late step-2 contest: correctly rejected after the frozen 60-second deadline; documented as an execution rejection, not a protocol failure
+
+### Flow 2 — canonical contest demonstration
+
+- state: ✅ COMPLETED
+- all nine required lifecycle transactions: ✅ FINALIZED / SUCCESS
+- all four semantic manifests: ✅ SATISFIED
+- step-2 primary digest equals step-2 contest digest: ✅ PASS
+- funded: `0.03 GEN`
+- released: `0.03 GEN`
+- refunded: `0`
+- remaining: `0`
+- escrow invariant: ✅ PASS
+- bonds received: `0.0005 GEN`
+- bonds locked: `0`
+- bonds returned: `0`
+- bonds forfeited: `0.0005 GEN`
+- bond invariant: ✅ PASS
+
+Current global accounting after both Flows:
+
+- funded: `0.06 GEN`
+- released: `0.06 GEN`
+- refunded: `0`
+- remaining: `0`
+- bonds received: `0.0005 GEN`
+- bonds locked: `0`
+- bonds returned: `0`
+- bonds forfeited: `0.0005 GEN`
 
 ## Verification and CI
 
 - Contract tests: ✅
-- Contract static / GenVM lint / SDK validation: ✅
-- Frontend lint/typecheck/tests/build: ✅
-- Canonical live Studionet verification: ✅
-- Live frontend HTTP/config verification: ⏳ runs after Vercel deployment
-- Direct Mode: ⚠️ **documented stable-runtime harness limitation**, not a PASS. The pinned harness raises `DecodingError: unexpected end of memory` while importing the v0.2.16 SDK before Flowed executes. Preserved tests remain diagnostic.
+- Contract syntax validation: ✅
+- GenVM lint / SDK validation: ✅
+- Frontend lint / typecheck / tests / build: ✅
+- Deployment preflight: ✅
+- Canonical live Studionet verifier: ✅
+- Canonical Flow-2 verifier: ✅ gated in `.github/workflows/canonical-live.yml`
+- Vercel live verification: ✅
+- GitHub Actions: ✅ required final runs inspected after push
 
-## Canonical 3-step demonstration
-
-Immutable evidence is committed and ready. The real 0.03 GEN Flow has not yet been created because it requires funded payer and recipient wallet signatures. No Flow ID, lifecycle transaction hash, semantic label, snapshot digest, or final live accounting is invented.
-
-The remaining execution is only the signed live lifecycle:
-
-1. payer creates the 0.03 GEN three-step Flow
-2. recipient accepts and reviews each active step
-3. payer contests step 2 with exactly 0.0005 GEN
-4. permissionless finalizers/contest resolver complete the lifecycle
-5. finalized state and accounting are captured into `docs/LIVE_VERIFICATION.md`
+Direct Mode remains a **diagnostic limitation**, not a genuine PASS. The pinned v0.2.16 local Direct Mode harness raises `DecodingError: unexpected end of memory` during SDK import before Flowed contract execution is reached. Finalized Studionet evidence is therefore the authoritative live-runtime proof.
