@@ -59,5 +59,5 @@ console.log(JSON.stringify({
   runner: 'py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6',
   constructorArgs: [],
   constructorValueWei: '0',
-  nextAction: 'No redeployment. Verify the canonical live deployment and execute the live Flow against the existing address.',
+  nextAction: 'No redeployment. Canonical deployment is frozen; verify the existing live deployment and canonical Flow 2 evidence.',
 }, null, 2));
