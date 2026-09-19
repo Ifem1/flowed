@@ -7,6 +7,17 @@
 **Core contract count:** **1**  
 **Core contract:** `contracts/Flowed.py`
 
+> **Final-status note**
+>
+> This document is the original implementation specification and is retained as historical design context. Flowed is now deployed and fully verified. For current production status, canonical live evidence, final accounting, and submission readiness, use:
+>
+> - `BUILD_STATUS.md`
+> - `docs/LIVE_VERIFICATION.md`
+> - `docs/DEPLOYMENT.md`
+> - `SUBMISSION.md`
+>
+> Where this specification describes future execution steps or example completion checklists, those sections should be read as build-time requirements rather than current project status.
+
 ---
 
 ## 0. Purpose of this document
@@ -2254,7 +2265,7 @@ Maintain a compact checklist:
 Contract implementation      ✅
 Contract lint                ✅
 Behavioral tests             ✅
-Direct Mode                  ✅
+Direct Mode diagnostic       ⚠️ documented stable-runtime harness limitation
 Frontend typecheck           ✅
 Frontend lint                ✅
 Frontend tests               ✅
