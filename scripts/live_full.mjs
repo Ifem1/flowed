@@ -23,7 +23,7 @@ const read = (functionName, args = []) => client.readContract({
 });
 
 function finalizedSuccess(receipt) {
-  const finalized = receipt?.statusName === TransactionStatus.FINALIZED || Number(receipt?.status) === 7;
+  const finalized = receipt?.statusName === 'FINALIZED' || Number(receipt?.status) === 7;
   const leaderRaw = receipt?.consensus_data?.leader_receipt;
   const leaders = Array.isArray(leaderRaw) ? leaderRaw : leaderRaw ? [leaderRaw] : [];
   const executionOk =
