@@ -1,8 +1,10 @@
 # Flowed
 
+This milestone extends accepted Flowed with bilateral amendments for future inactive steps. Payer and recipient can update criteria, evidence sources, and TTL while active/completed work and funded economics remain fixed. See [Milestone](docs/MILESTONE.md).
+
 **Work moves. Money follows.**
 
-Flowed is a funded sequential semantic workflow on GenLayer. One payer funds a 2–8 step workflow upfront. Each step freezes its exact tranche, acceptance criteria, public evidence sources, and timing. GenLayer classifies only whether the current active step satisfies those frozen criteria; deterministic contract logic moves the already-committed funds and activates the next step.
+Flowed is a funded sequential semantic workflow on GenLayer. One payer funds a 2–8 step workflow upfront. Each step’s tranche is fixed at creation; future inactive steps can later receive a new criteria, evidence, and TTL version after exact bilateral approval. GenLayer judges only the active version against its frozen evidence snapshot, while deterministic contract logic moves the already-committed funds and activates the next step.
 
 **GenLayer verifies progression. Deterministic code moves funds.**
 

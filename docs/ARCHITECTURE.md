@@ -37,6 +37,10 @@ RELEASE
 
 Only the current active step can be judged. A future step has no activation timestamp or deadline until deterministic release advances the active index.
 
+## Versioned future-step amendments
+
+Either participant may propose changes only to a step whose index exceeds the active index. Criteria, normalized HTTPS evidence sources, and TTL are the only amendable fields. The counterparty must approve the exact monotonically assigned proposal ID and base version; the proposer cannot self-approve. Cancellation, rejection, stale IDs, terminal Flows, and target activation invalidate approval. Each step starts at v1 and commits to canonical JSON with a SHA-256 configuration digest. Approval appends bounded history and changes only the allowed configuration, version, and digest. Per step, at most 8 proposals and 4 approvals are allowed; total accepted history is capped at 32 records. Escrow and all economic configuration remain unchanged.
+
 ## Semantic architecture
 
 Primary review first creates a bounded canonical snapshot from only creation-frozen HTTPS sources. The fetch is wrapped by equality-backed consensus. Required unavailable/empty/non-2xx sources produce `SOURCE_UNAVAILABLE`; optional unavailable sources remain represented. Source bodies are bounded before canonical JSON serialization. The contract records the SHA-256 digest.
@@ -65,5 +69,7 @@ The browser uses `genlayer-js` against the canonical Studionet contract. `get_fl
 Writes use only an injected EIP-1193 provider. The browser detects the connected chain, requests Studionet `61999` when needed, constructs all GEN values with `BigInt`, and displays transaction progress separately as awaiting signature, submitted, consensus, finalizing, completed, or failed.
 
 For stable Studio v0.2.16 finality, a write is considered complete only when the transaction is `FINALIZED` and successful execution is proven by either the SDK execution-result field or the stable Studio consensus leader receipt `execution_result: SUCCESS`. Merely reaching `ACCEPTED` is never treated as completion.
+
+Primary and contest manifests identify the active step version and configuration digest. Contest resolution continues to evaluate the exact stored primary evidence snapshot.
 
 The application reconstructs Flow lists, details, manifests, and accounting from canonical contract reads on reload; no JavaScript demo-flow object is an operational source of truth.

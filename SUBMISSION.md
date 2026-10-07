@@ -86,3 +86,7 @@ Flow 2 bonds:
 **Bond invariant: PASS**
 
 Full receipt, manifest, digest, and Flow-1 evidence is recorded in [docs/LIVE_VERIFICATION.md](docs/LIVE_VERIFICATION.md).
+
+## Future-step amendment milestone copy
+
+This milestone extends accepted Flowed from fully frozen sequential workflows into versioned workflows where payer and recipient can mutually amend future inactive steps without changing escrow economics. Exact proposal IDs require counterparty approval for criteria, evidence sources, and TTL; active and completed steps remain immutable. Canonical configuration digests and semantic manifest version binding make the reviewed specification auditable. Contract and frontend tests pass locally. The accepted contract remains separate; fresh Studionet deployment and live 3-step amendment proof are pending finalized transactions.

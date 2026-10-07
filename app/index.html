@@ -89,6 +89,7 @@
     </main>
   </div>
   <div class="tx-panel" id="tx-panel" hidden><strong id="tx-stage">Awaiting signature</strong><small id="tx-detail"></small></div>
+  <dialog id="amend-modal" class="form-card amendment-modal"><form id="amend-form"><div class="page-heading"><div><p class="eyebrow">FUTURE STEP CHANGE</p><h2>Propose amendment</h2></div><button type="button" class="text-btn" id="amend-cancel">Close</button></div><p id="amend-version" class="muted"></p><label>Acceptance criteria<textarea id="amend-criteria" maxlength="2000" required></textarea></label><label>Evidence sources</label><div id="amend-sources"></div><button class="ghost-btn" id="amend-add-source" type="button">＋ Add source</button><label>TTL (seconds)<input id="amend-ttl" type="number" min="300" max="2592000" required /></label><div class="review-box panel"><strong id="amend-amount"></strong><p>Funding and tranche amount cannot be amended.</p><p id="amend-old-digest"></p><p>Preview: criteria, evidence sources, and TTL will change.</p></div><div class="form-footer"><button class="ghost-btn" id="amend-cancel-2" type="button">Cancel</button><button class="primary" type="submit">Propose amendment</button></div></form></dialog>
   <div class="toast" id="toast"></div>
   <script src="/config.js"></script>
   <script type="module" src="/app.js"></script>

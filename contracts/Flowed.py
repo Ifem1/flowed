@@ -20,6 +20,9 @@ RETRY, RECOVERY = 120, 24 * 60 * 60
 MAX_SOURCES = 4
 MAX_SOURCE_BODY = 2400
 MAX_ATTEMPTS = 32
+MAX_AMENDMENTS_PER_STEP = 4
+MAX_AMENDMENT_PROPOSALS_PER_STEP = 8
+MAX_AMENDMENT_HISTORY = 32
 ZERO = "0x0000000000000000000000000000000000000000"
 LABELS = ("SATISFIED", "NOT_SATISFIED", "INCONCLUSIVE")
 INFRA_LABELS = ("SOURCE_UNAVAILABLE", "INCONCLUSIVE", "MODEL_OUTPUT_INVALID")
@@ -60,6 +63,7 @@ class Flowed(gl.Contract):
     bonds_locked: u256
     bonds_returned: u256
     bonds_forfeited: u256
+    next_amendment_id: u256
 
     def __init__(self):
         self.next_flow_id = 1
@@ -70,6 +74,45 @@ class Flowed(gl.Contract):
         self.bonds_locked = 0
         self.bonds_returned = 0
         self.bonds_forfeited = 0
+        self.next_amendment_id = 1
+
+    def _config_digest(self, criteria, sources, ttl, version):
+        canonical = json.dumps({"criteria": criteria, "sources": sources,
+                                "ttl_seconds": ttl, "version": version},
+                               sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(canonical.encode()).hexdigest()
+
+    def _normalize_amendment(self, criteria, sources_json, ttl):
+        assert isinstance(criteria, str) and 0 < len(criteria) <= 2000
+        assert isinstance(sources_json, str) and len(sources_json) <= 12000
+        sources = json.loads(sources_json)
+        assert isinstance(sources, list) and 1 <= len(sources) <= MAX_SOURCES
+        seen, required = set(), 0
+        normalized = []
+        for src in sources:
+            assert isinstance(src, dict)
+            label, url, is_required = src.get("label"), src.get("url"), src.get("required")
+            assert isinstance(label, str) and 0 < len(label) <= 100
+            assert _valid_url(url)
+            assert url not in seen and type(is_required) is bool
+            seen.add(url)
+            required += int(is_required)
+            normalized.append({"label": label, "url": url, "required": is_required})
+        assert required > 0 and type(ttl) is int and MIN_TTL <= ttl <= MAX_TTL
+        return normalized
+
+    def _future_amendment_target(self, f, index):
+        assert f["state"] in ("ACTIVE", "PROVISIONAL", "CONTESTED")
+        assert type(index) is int and f["active"] < index < len(f["steps"])
+
+    def _terminalize_amendment(self, f, index, status):
+        proposal = f["steps"][index].get("pending_amendment")
+        if proposal:
+            proposal["status"] = status
+            f["amendment_events"].append({"proposal_id": proposal["proposal_id"],
+                                         "step_index": index, "status": status,
+                                         "timestamp": _now()})
+            f["steps"][index].pop("pending_amendment", None)
 
     def _flow(self, fid):
         f = json.loads(self.flows[fid])
@@ -109,6 +152,7 @@ class Flowed(gl.Contract):
                 urls.add(src["url"])
                 required += int(src["required"])
             assert required > 0
+            s["sources"] = [{"label": src["label"], "url": src["url"], "required": src["required"]} for src in s["sources"]]
             raw_amount = s.get("amount_wei")
             assert isinstance(raw_amount, str) and raw_amount.isdigit() and len(raw_amount) <= 78
             amount = int(raw_amount)
@@ -128,6 +172,12 @@ class Flowed(gl.Contract):
         assert MIN_CONTEST <= contest_window_seconds <= MAX_CONTEST
         steps, total = self._steps(steps_json)
         assert total == escrow_amount == gl.message.value
+        for step in steps:
+            step["version"] = 1
+            step["config_digest"] = self._config_digest(step["criteria"], step["sources"], step["ttl_seconds"], 1)
+            step["amendment_attempts"] = 0
+            step["accepted_amendments"] = 0
+            step["amendment_history"] = []
         fid = self.next_flow_id
         self.next_flow_id += 1
         f = {
@@ -139,11 +189,95 @@ class Flowed(gl.Contract):
             "contest_bond": 0, "contest_deadline": 0, "review_attempts": 0, "last_review_at": 0,
             "last_review_label": "", "contest_opened_at": 0, "contest_attempts": 0,
             "last_contest_at": 0, "bonds_received": 0, "bonds_locked": 0,
-            "bonds_returned": 0, "bonds_forfeited": 0
+            "bonds_returned": 0, "bonds_forfeited": 0, "amendment_history": [], "amendment_events": []
         }
         self.funded += escrow_amount
         self._assert_accounting(f)
         self.flows[fid] = json.dumps(f)
+
+    @gl.public.write
+    def propose_step_amendment(self, flow_id: u256, step_index: u256,
+                               criteria: str, sources_json: str, ttl_seconds: u256) -> None:
+        f = self._flow(flow_id)
+        index = int(step_index)
+        self._future_amendment_target(f, index)
+        sender = str(gl.message.sender_address)
+        assert sender in (f["payer"], f["recipient"])
+        step = f["steps"][index]
+        assert "pending_amendment" not in step
+        assert step.get("amendment_attempts", 0) < MAX_AMENDMENT_PROPOSALS_PER_STEP
+        sources = self._normalize_amendment(criteria, sources_json, int(ttl_seconds))
+        version = step["version"]
+        proposal_id = self.next_amendment_id
+        self.next_amendment_id += 1
+        step["amendment_attempts"] = step.get("amendment_attempts", 0) + 1
+        step["pending_amendment"] = {
+            "proposal_id": proposal_id, "step_index": index, "base_version": version,
+            "proposer": sender, "criteria": criteria, "sources": sources,
+            "ttl_seconds": int(ttl_seconds), "config_digest": self._config_digest(criteria, sources, int(ttl_seconds), version + 1),
+            "created_at": _now(), "status": "PROPOSED"
+        }
+        self._event(f, "AMENDMENT_PROPOSED", str(proposal_id))
+        self._assert_accounting(f)
+        self.flows[flow_id] = json.dumps(f)
+
+    @gl.public.write
+    def approve_step_amendment(self, flow_id: u256, step_index: u256, proposal_id: u256) -> None:
+        f = self._flow(flow_id)
+        index = int(step_index)
+        self._future_amendment_target(f, index)
+        step = f["steps"][index]
+        proposal = step.get("pending_amendment")
+        assert proposal and proposal["status"] == "PROPOSED" and proposal["proposal_id"] == int(proposal_id)
+        assert proposal["base_version"] == step["version"]
+        sender = str(gl.message.sender_address)
+        assert sender != proposal["proposer"] and sender in (f["payer"], f["recipient"])
+        assert step.get("accepted_amendments", 0) < MAX_AMENDMENTS_PER_STEP
+        sources = self._normalize_amendment(proposal["criteria"], json.dumps(proposal["sources"]), proposal["ttl_seconds"])
+        old_version, old_digest = step["version"], step["config_digest"]
+        new_version = old_version + 1
+        new_digest = self._config_digest(proposal["criteria"], sources, proposal["ttl_seconds"], new_version)
+        assert new_digest == proposal["config_digest"]
+        record = {"proposal_id": proposal["proposal_id"], "step_index": index,
+                  "old_version": old_version, "new_version": new_version,
+                  "old_config_digest": old_digest, "new_config_digest": new_digest,
+                  "proposer": proposal["proposer"], "approver": sender,
+                  "timestamp": _now()}
+        assert len(f["amendment_history"]) < MAX_AMENDMENT_HISTORY
+        f["amendment_history"].append(record)
+        step["amendment_history"].append(record)
+        step["criteria"], step["sources"], step["ttl_seconds"] = proposal["criteria"], sources, proposal["ttl_seconds"]
+        step["version"], step["config_digest"] = new_version, new_digest
+        step["accepted_amendments"] = step.get("accepted_amendments", 0) + 1
+        step.pop("pending_amendment", None)
+        self._event(f, "AMENDMENT_APPROVED", str(proposal_id))
+        self._assert_accounting(f)
+        self.flows[flow_id] = json.dumps(f)
+
+    @gl.public.write
+    def reject_step_amendment(self, flow_id: u256, step_index: u256, proposal_id: u256) -> None:
+        self._close_step_amendment(flow_id, step_index, proposal_id, "REJECTED", False)
+
+    @gl.public.write
+    def cancel_step_amendment(self, flow_id: u256, step_index: u256, proposal_id: u256) -> None:
+        self._close_step_amendment(flow_id, step_index, proposal_id, "CANCELLED", True)
+
+    def _close_step_amendment(self, flow_id, step_index, proposal_id, outcome, proposer_action):
+        f = self._flow(flow_id)
+        index = int(step_index)
+        self._future_amendment_target(f, index)
+        step = f["steps"][index]
+        proposal = step.get("pending_amendment")
+        assert proposal and proposal["proposal_id"] == int(proposal_id) and proposal["status"] == "PROPOSED"
+        sender = str(gl.message.sender_address)
+        if proposer_action:
+            assert sender == proposal["proposer"]
+        else:
+            assert sender != proposal["proposer"] and sender in (f["payer"], f["recipient"])
+        self._terminalize_amendment(f, index, outcome)
+        self._event(f, "AMENDMENT_" + outcome, str(proposal_id))
+        self._assert_accounting(f)
+        self.flows[flow_id] = json.dumps(f)
 
     @gl.public.write
     def accept_flow(self, flow_id: u256) -> None:
@@ -246,7 +380,7 @@ class Flowed(gl.Contract):
         f["last_review_label"] = result
         s["last_review_label"] = result
         s["snapshot_digest"] = digest
-        f["manifests"].append({"flow_id": flow_id, "step_index": f["active"], "phase": "PRIMARY", "round": f["review_attempts"], "timestamp": now, "label": result, "snapshot_digest": digest, "source_count": len(s["sources"])})
+        f["manifests"].append({"flow_id": flow_id, "step_index": f["active"], "step_version": s["version"], "config_digest": s["config_digest"], "phase": "PRIMARY", "round": f["review_attempts"], "timestamp": now, "label": result, "snapshot_digest": digest, "source_count": len(s["sources"])})
         if result == "SATISFIED":
             f["state"] = "PROVISIONAL"
             f["contest_deadline"] = now + f["contest_window"]
@@ -293,7 +427,7 @@ class Flowed(gl.Contract):
         result = self._classify(s["criteria"], s["snapshot"])
         f["contest_attempts"] += 1
         f["last_contest_at"] = now
-        f["manifests"].append({"flow_id": flow_id, "step_index": f["active"], "phase": "CONTEST", "round": f["contest_attempts"], "timestamp": now, "label": result, "snapshot_digest": s["snapshot_digest"], "source_count": len(s["sources"])})
+        f["manifests"].append({"flow_id": flow_id, "step_index": f["active"], "step_version": s["version"], "config_digest": s["config_digest"], "phase": "CONTEST", "round": f["contest_attempts"], "timestamp": now, "label": result, "snapshot_digest": s["snapshot_digest"], "source_count": len(s["sources"])})
         if result not in ("SATISFIED", "NOT_SATISFIED"):
             self._assert_accounting(f)
             self.flows[flow_id] = json.dumps(f)
@@ -356,6 +490,7 @@ class Flowed(gl.Contract):
             self._event(f, "COMPLETED")
         else:
             now = _now()
+            self._terminalize_amendment(f, f["active"], "EXPIRED_ON_ACTIVATION")
             f["state"] = "ACTIVE"
             f["steps"][f["active"]]["activated_at"] = now
             f["steps"][f["active"]]["deadline"] = now + f["steps"][f["active"]]["ttl_seconds"]
@@ -418,3 +553,10 @@ class Flowed(gl.Contract):
         if f["state"] not in ("ACTIVE", "PROVISIONAL", "CONTESTED") or f["active"] >= len(f["steps"]):
             return ""
         return json.dumps(f["steps"][f["active"]])
+
+    @gl.public.view
+    def get_step_amendment_history(self, flow_id: u256, offset: u256, limit: u256) -> str:
+        f = self._flow(flow_id)
+        assert int(limit) <= 32
+        rows = f.get("amendment_history", [])[int(offset):int(offset) + int(limit)]
+        return json.dumps(rows)

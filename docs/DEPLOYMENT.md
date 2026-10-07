@@ -1,8 +1,12 @@
 # Deployment
 
-## Canonical production deployment
+## Amendment milestone deployment
 
-Flowed is already deployed. Do **not** redeploy or modify `contracts/Flowed.py`.
+The contract change requires a separate fresh Studionet `61999` deployment. Keep historical contract `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad` and its live evidence unchanged. Add the milestone address only after finalized deployment; current milestone address and live amendment proof are pending.
+
+## Historical canonical production deployment (accepted baseline)
+
+This accepted deployment does not include future-step amendments. Keep it and all historical evidence unchanged; deploy a separate milestone contract when ready.
 
 - Network: **GenLayer Studionet**
 - Chain ID: **61999**
