@@ -30,6 +30,6 @@ Live deployment and amendment record: [AMENDMENT_LIVE_VERIFICATION.md](AMENDMENT
 
 Accepted baseline: `27bbd4574ec03244fb8841a8dc3abd84739780be`.
 Implementation commit: `5db3383` (`add versioned future-step amendments`); build-safety follow-up: `a52487c`.
-Compare URL: https://github.com/Ifem1/flowed/compare/27bbd4574ec03244fb8841a8dc3abd84739780be...4144050b43021d08dd68fd524b497f0fc17b452b
+Compare URL: https://github.com/Ifem1/flowed/compare/27bbd4574ec03244fb8841a8dc3abd84739780be...6ce5f86b064a7b2fd96925e0a1c6c50350f3829e
 
 The production frontend at https://flowed-eight.vercel.app/ now uses the fresh milestone contract and refuses the historical contract as its configured address. Its Vercel production deployment is READY; the live application reports chain `61999` and this contract. Flow 1 and Flow 2 are readable, and Flow 2 shows Step 3 version 2, the amended configuration digest, amendment history, and version/digest on its manifests. See [AMENDMENT_LIVE_VERIFICATION.md](AMENDMENT_LIVE_VERIFICATION.md) for live checks and deployment details.
