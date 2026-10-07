@@ -1,6 +1,7 @@
 import { cp, mkdir, writeFile } from 'node:fs/promises';
 
 const HISTORICAL_CONTRACT = '0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad';
+const MILESTONE_CONTRACT = '0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443';
 
 await mkdir('dist/app', { recursive: true });
 for (const file of ['index.html', 'landing.css', 'landing.js', 'styles.css', 'app.js', 'wallet-ux.js', 'lossless-json.js', 'amendments.js']) {
@@ -8,7 +9,7 @@ for (const file of ['index.html', 'landing.css', 'landing.js', 'styles.css', 'ap
 }
 await cp('app/index.html', 'dist/app/index.html');
 
-const address = (process.env.FLOWED_CONTRACT_ADDRESS || '').trim();
+const address = (process.env.FLOWED_CONTRACT_ADDRESS || MILESTONE_CONTRACT).trim();
 if (address && !/^0x[a-fA-F0-9]{40}$/.test(address)) throw new Error('FLOWED_CONTRACT_ADDRESS must be a 20-byte hex address');
 if (address.toLowerCase() === HISTORICAL_CONTRACT.toLowerCase()) {
   throw new Error(`The historical contract ${HISTORICAL_CONTRACT} does not implement amendments and cannot back the milestone app`);

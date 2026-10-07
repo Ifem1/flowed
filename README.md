@@ -12,7 +12,8 @@ Flowed is a funded sequential semantic workflow on GenLayer. One payer funds a 2
 
 - Live app: https://flowed-eight.vercel.app/
 - Operational app: https://flowed-eight.vercel.app/app
-- Canonical contract: [`0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`](https://explorer-studio.genlayer.com/address/0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad)
+- Accepted historical contract (no amendments): [`0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`](https://explorer-studio.genlayer.com/address/0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad)
+- Future-step amendment milestone contract: [`0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443`](https://explorer-studio.genlayer.com/address/0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443)
 - Network: **GenLayer Studionet**
 - Chain ID: `61999`
 - RPC: `https://studio.genlayer.com/api`
@@ -23,7 +24,9 @@ Flowed is a funded sequential semantic workflow on GenLayer. One payer funds a 2
 - Runtime: `v0.2.16`
 - Runner: `py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6`
 
-The deployed contract source is frozen. Later repository commits change only frontend, verification tooling, evidence documentation, and submission material.
+Both deployed contract sources are frozen. Later repository commits change only frontend, verification tooling, evidence documentation, and submission material.
+
+The milestone deployment and full live future-step amendment proof are recorded in [docs/AMENDMENT_LIVE_VERIFICATION.md](docs/AMENDMENT_LIVE_VERIFICATION.md). The existing production URL remains on the historical deployment until the milestone frontend is published.
 
 ## Architecture
 

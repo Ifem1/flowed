@@ -2,7 +2,15 @@
 
 ## Amendment milestone deployment
 
-The contract change requires a separate fresh Studionet `61999` deployment. Keep historical contract `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad` and its live evidence unchanged. Add the milestone address only after finalized deployment; current milestone address and live amendment proof are pending.
+The future-step amendment milestone is deployed separately on Studionet `61999`. Keep historical contract `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad` and its live evidence unchanged.
+
+- Milestone contract: [`0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443`](https://explorer-studio.genlayer.com/address/0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443)
+- Deployment transaction: [`0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1`](https://explorer-studio.genlayer.com/tx/0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1), FINALIZED / SUCCESS
+- Deployed source commit: `5ede53d8a2a1ec164df5d2f4962e3dda2d908c92`
+- Source SHA-256: `97332aa0cfb4f8d0a497421e466ab30953d93cebfb60661cbf6d1121ca88aea8`
+- Source Git blob: `8c12fd7524fb29e68097ce3adb0c348c791edcc7`
+- Runtime: `v0.2.16`
+- Full finalized amendment lifecycle evidence: [AMENDMENT_LIVE_VERIFICATION.md](AMENDMENT_LIVE_VERIFICATION.md)
 
 ## Historical canonical production deployment (accepted baseline)
 
@@ -26,12 +34,14 @@ This accepted deployment does not include future-step amendments. Keep it and al
 
 ## Production frontend
 
-Production is live:
+The accepted production app remains on the historical deployment. The milestone branch build points to the fresh milestone contract; publishing that frontend is a separate Vercel deployment.
+
+Accepted production app:
 
 - https://flowed-eight.vercel.app/
 - https://flowed-eight.vercel.app/app
 
-Vercel builds `npm run build` to `dist`. Production configuration defaults to the canonical contract and rejects any different `FLOWED_CONTRACT_ADDRESS`.
+Vercel builds `npm run build` to `dist`. The milestone build defaults to the fresh amendment contract and rejects the historical address.
 
 Live frontend verification:
 

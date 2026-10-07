@@ -22,14 +22,14 @@ The local Windows SDK validator is blocked by `Access is denied` loading the cac
 
 ## Deployment and live amendment demonstration
 
-The accepted historical deployment is `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad` on GenLayer Studionet chain `61999`; keep its source and live evidence unchanged. The milestone contract requires a fresh deployment. Milestone address, deployment transaction, source fingerprint, and live 3-step amendment transactions must be recorded after actual finalized execution.
+The accepted historical deployment is `0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad` on GenLayer Studionet chain `61999`; its source and live evidence remain unchanged. The fresh milestone contract `0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443` is finalized, and two three-step Flows completed. Flow 2 records a mutually approved step 3 amendment from version 1 to version 2, followed by a successful version 2 semantic review and full tranche release. See [AMENDMENT_LIVE_VERIFICATION.md](AMENDMENT_LIVE_VERIFICATION.md) for deployment and transaction evidence.
 
-Live verification template: [AMENDMENT_LIVE_VERIFICATION.md](AMENDMENT_LIVE_VERIFICATION.md). Historical Flow 1/Flow 2 evidence remains in [LIVE_VERIFICATION.md](LIVE_VERIFICATION.md).
+Live deployment and amendment record: [AMENDMENT_LIVE_VERIFICATION.md](AMENDMENT_LIVE_VERIFICATION.md). Historical Flow 1/Flow 2 evidence remains in [LIVE_VERIFICATION.md](LIVE_VERIFICATION.md).
 
 ## Compare
 
 Accepted baseline: `27bbd4574ec03244fb8841a8dc3abd84739780be`.
 Implementation commit: `5db3383` (`add versioned future-step amendments`); build-safety follow-up: `a52487c`.
-Compare URL: https://github.com/Ifem1/flowed/compare/27bbd4574ec03244fb8841a8dc3abd84739780be...a52487c
+Compare URL: https://github.com/Ifem1/flowed/compare/27bbd4574ec03244fb8841a8dc3abd84739780be...codex/future-step-amendments-review
 
-The branch is not deployed to production. Its build intentionally refuses to use the historical contract, and the accepted production app remains on the original deployment until a fresh milestone contract is finalized.
+The milestone frontend build now defaults to the fresh milestone contract and refuses to use the historical contract. The accepted production app remains on the original deployment until a separate frontend publication.
