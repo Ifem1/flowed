@@ -14,7 +14,7 @@ The future-step amendment milestone is deployed separately on Studionet `61999`.
 
 ## Historical canonical production deployment (accepted baseline)
 
-This accepted deployment does not include future-step amendments. Keep it and all historical evidence unchanged; deploy a separate milestone contract when ready.
+This accepted historical deployment does not include future-step amendments. Keep it and its historical evidence unchanged. The current production frontend now points to the separate milestone contract below.
 
 - Network: **GenLayer Studionet**
 - Chain ID: **61999**
@@ -34,14 +34,18 @@ This accepted deployment does not include future-step amendments. Keep it and al
 
 ## Production frontend
 
-The accepted production app remains on the historical deployment. The milestone branch build points to the fresh milestone contract; publishing that frontend is a separate Vercel deployment.
+The accepted historical contract remains deployed and unchanged. The current production frontend uses the milestone contract on Studionet `61999`.
 
-Accepted production app:
+Production app:
 
 - https://flowed-eight.vercel.app/
 - https://flowed-eight.vercel.app/app
 
 Vercel builds `npm run build` to `dist`. The milestone build defaults to the fresh amendment contract and rejects the historical address.
+
+- Production URL: https://flowed-eight.vercel.app/
+- Vercel deployment: `dpl_DEF7gsLfzwfENfDJfyh3Xue7DKSy` (Production / READY)
+- `config.js` reports chain ID `61999` and milestone contract `0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443`.
 
 Live frontend verification:
 

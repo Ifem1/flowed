@@ -2,6 +2,10 @@
 
 All entries below come from finalized Studionet receipts and latest-final contract reads. Historical deployment evidence in [`LIVE_VERIFICATION.md`](LIVE_VERIFICATION.md) is unchanged.
 
+## Current production frontend
+
+The current production frontend is [https://flowed-eight.vercel.app/](https://flowed-eight.vercel.app/) (`/app`), deployed to Vercel as `dpl_DEF7gsLfzwfENfDJfyh3Xue7DKSy` with Production status `READY`. Its live `/config.js` returns HTTP 200 and identifies GenLayer Studionet chain `61999` and milestone contract `0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443`. The app route returns HTTP 200. Browser inspection confirmed Flow 1 and Flow 2 render; Flow 2 shows Step 3 version 2, config digest `249d2ad58a658c7a0babf7de3e40ca47b45039557edf60eae51dc3652e252f9e`, amendment history, and manifests with step version/config digest. The completed Flow exposes no wallet action controls. Wallet connection, wrong-network gating, and amendment role/state gating are covered by the frontend tests; no injected wallet provider was available in the live browser session for an on-chain wallet interaction.
+
 ## Milestone deployment
 
 | Field | Value |

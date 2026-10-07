@@ -32,14 +32,15 @@ The model is allowed to classify the frozen evidence snapshot as `SATISFIED`, `N
 
 - Live app: https://flowed-eight.vercel.app/
 - Operational app: https://flowed-eight.vercel.app/app
-- Accepted historical contract (without amendments): [`0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`](https://explorer-studio.genlayer.com/address/0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad)
+- Accepted historical contract (without amendments; retained for historical evidence): [`0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`](https://explorer-studio.genlayer.com/address/0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad)
+- Current production frontend contract: [`0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443`](https://explorer-studio.genlayer.com/address/0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443)
 - Network: GenLayer Studionet `61999`
 - Canonical deployed source: `c628a86951d59de4c774d89cb4c8ae5cbb1e4e47`
 - Deployment tx: [`0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a`](https://explorer-studio.genlayer.com/tx/0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a)
 
 The amendment milestone is separately deployed at [`0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443`](https://explorer-studio.genlayer.com/address/0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443), with finalized deployment transaction [`0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1`](https://explorer-studio.genlayer.com/tx/0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1). Full deployment and lifecycle evidence: [docs/AMENDMENT_LIVE_VERIFICATION.md](docs/AMENDMENT_LIVE_VERIFICATION.md).
 
-The existing production frontend currently remains on the historical contract while the milestone frontend is released.
+The production frontend at https://flowed-eight.vercel.app/ now uses the amendment milestone contract. Its production deployment and live verification are documented in [docs/AMENDMENT_LIVE_VERIFICATION.md](docs/AMENDMENT_LIVE_VERIFICATION.md).
 
 ## Live proof
 
@@ -93,4 +94,4 @@ Full receipt, manifest, digest, and Flow-1 evidence is recorded in [docs/LIVE_VE
 
 ## Future-step amendment milestone copy
 
-This milestone extends accepted Flowed with versioned future steps that payer and recipient can amend by mutual approval without changing escrow economics. Proposal IDs and base versions prevent stale approval; active and completed steps remain immutable. Configuration digests bind the amended criteria, evidence sources, and TTL to semantic manifests. The separate milestone contract is deployed on Studionet, and two three-step Flows completed with all `0.06 GEN` released. Flow 2 records the mutually approved Step 3 version 2 amendment and successful semantic review. Contract and frontend tests pass; the existing production frontend is being switched to the milestone contract as part of this release.
+This milestone adds versioned future steps that payer and recipient can amend by mutual approval without changing escrow economics. Proposal IDs and base versions prevent stale approval; active and completed steps remain immutable. Configuration digests bind amended criteria, evidence sources, and TTL to semantic manifests. The milestone contract is deployed on Studionet `61999`, and the production frontend at https://flowed-eight.vercel.app/ uses it. Two three-step Flows completed with all `0.06 GEN` released; Flow 2 proves the mutually approved Step 3 version 2 amendment and successful semantic review. Contract and frontend test suites pass.

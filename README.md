@@ -26,7 +26,7 @@ Flowed is a funded sequential semantic workflow on GenLayer. One payer funds a 2
 
 Both deployed contract sources are frozen. Later repository commits change only frontend, verification tooling, evidence documentation, and submission material.
 
-The milestone deployment and full live future-step amendment proof are recorded in [docs/AMENDMENT_LIVE_VERIFICATION.md](docs/AMENDMENT_LIVE_VERIFICATION.md). The existing production URL remains on the historical deployment until the milestone frontend is published.
+The accepted historical contract and the new amendment milestone deployment are documented separately. The production frontend at [flowed-eight.vercel.app](https://flowed-eight.vercel.app/) now uses the milestone contract on Studionet `61999`; deployment and live UI evidence are recorded in [docs/AMENDMENT_LIVE_VERIFICATION.md](docs/AMENDMENT_LIVE_VERIFICATION.md).
 
 ## Architecture
 

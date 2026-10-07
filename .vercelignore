@@ -1,0 +1,10 @@
+.git
+.vercel
+node_modules
+.pytest_cache
+__pycache__
+*.pyc
+tests
+artifacts
+diagnostics
+demo-evidence
