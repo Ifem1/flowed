@@ -27,4 +27,7 @@ Live verification template: [AMENDMENT_LIVE_VERIFICATION.md](AMENDMENT_LIVE_VERI
 ## Compare
 
 Accepted baseline: `27bbd4574ec03244fb8841a8dc3abd84739780be`.
-Final milestone SHA and compare URL will be recorded after the milestone commit is created and pushed.
+Implementation commit: `5db3383` (`add versioned future-step amendments`); build-safety follow-up: `a52487c`.
+Compare URL: https://github.com/Ifem1/flowed/compare/27bbd4574ec03244fb8841a8dc3abd84739780be...a52487c
+
+The branch is not deployed to production. Its build intentionally refuses to use the historical contract, and the accepted production app remains on the original deployment until a fresh milestone contract is finalized.
