@@ -16,9 +16,9 @@ Limits: at most 8 proposal attempts and 4 accepted amendments per step; at most 
 
 ## Verification
 
-Local verification: Python contract/protocol suite `38 passed`; frontend suite `24 passed`; frontend lint, typecheck, contract syntax validation, production build, and `git diff --check` passed. GitHub Actions [Flowed CI](https://github.com/Ifem1/flowed/actions/runs/37661947807) passed, including Studionet preflight and both test suites. The separate [canonical live verifier](https://github.com/Ifem1/flowed/actions/runs/37661947878) passed against the accepted historical deployment and Flow 2 evidence; it is not amendment live proof.
+Local verification: Python contract/protocol suite `38 passed`; frontend suite `24 passed`; frontend lint, typecheck, contract syntax validation, production build, and `git diff --check` passed. Final GitHub Actions [Flowed CI](https://github.com/Ifem1/flowed/actions/runs/37662478641) passed, including Studionet preflight, frontend checks, contract/protocol suite, 3 GenVM lint checks, and GenVM SDK validation (`21` methods recognized). The separate [canonical live verifier](https://github.com/Ifem1/flowed/actions/runs/37662478548) passed against the accepted historical deployment and Flow 2 evidence; it is not amendment live proof.
 
-GenVM lint's three static checks pass, but local SDK validation is blocked by Windows `Access is denied` loading the cached GenLayer SDK. Direct Mode was not achieved: local Windows failed in the `gltest` loader deleting its open temp file (`PermissionError`, WinError 32); on GitHub Linux, all six Direct Mode tests fail with `DecodingError: unexpected end of memory` while loading the pinned stable v0.2.16 contract, before contract logic executes. No Direct Mode pass is claimed.
+The local Windows SDK validator is blocked by `Access is denied` loading the cached GenLayer SDK; Ubuntu CI successfully ran the same SDK validation. Direct Mode was not achieved: local Windows failed in the `gltest` loader deleting its open temp file (`PermissionError`, WinError 32); on GitHub Linux, all six Direct Mode tests fail with `DecodingError: unexpected end of memory` while loading the pinned stable v0.2.16 contract, before contract logic executes. The diagnostic CI job records this limitation without claiming a Direct Mode pass.
 
 ## Deployment and live amendment demonstration
 
