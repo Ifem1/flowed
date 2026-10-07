@@ -20,6 +20,7 @@ await writeFile(
     network: 'GenLayer Studionet',
     chainId: 61999,
     rpc: 'https://studio.genlayer.com/api',
+    historicalContractAddress: HISTORICAL_CONTRACT,
     contractAddress: address,
   })});\n`,
 );
