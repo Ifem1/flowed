@@ -39,7 +39,7 @@ class AmendmentLedger:
         self.active=0; self.state='ACTIVE'; self.next_id=1; self.funded=300; self.released=0; self.refunded=0
     def future(self,index): assert self.state=='ACTIVE' and self.active<index<len(self.steps)
     def propose(self,index,proposer,digest):
-        self.future(index); s=self.steps[index]; assert s['pending'] is None and s['attempts']<8
+        self.future(index); assert proposer in ('payer','recipient'); s=self.steps[index]; assert s['pending'] is None and s['attempts']<8
         p={'id':self.next_id,'base':s['version'],'proposer':proposer,'digest':digest,'status':'PROPOSED'}; self.next_id+=1;s['attempts']+=1;s['pending']=p;return p['id']
     def approve(self,index,pid,actor):
         self.future(index);s=self.steps[index];p=s['pending'];assert p and p['id']==pid and p['status']=='PROPOSED' and p['base']==s['version'];assert actor!=p['proposer'] and s['accepted']<4
@@ -58,16 +58,17 @@ def test_amendment_authorization_versioning_and_stale_ids():
     with pytest.raises(AssertionError):x.approve(2,pid,'recipient')
     pid2=x.propose(2,'recipient','c');x.approve(2,pid2,'payer');assert x.steps[2]['history']==[(1,2,pid),(2,3,pid2)]
 
-@pytest.mark.parametrize('actor,action',[('stranger','propose'),('payer','self-approve'),('proposer','counterparty-reject')])
-def test_amendment_wrong_role_denied(actor,action):
+def test_amendment_wrong_role_denied_on_clean_future_step():
+    x=AmendmentLedger();assert x.steps[2]['pending'] is None
+    with pytest.raises(AssertionError,match='payer|recipient'):
+        x.propose(2,'stranger','b')
+    assert x.steps[2]['pending'] is None
+
+def test_amendment_proposer_cannot_self_approve_and_exact_counterparty_can():
     x=AmendmentLedger();pid=x.propose(2,'payer','b')
-    if action=='counterparty-reject':
-        with pytest.raises(AssertionError):x.close(2,pid,'payer')
-        return
-    with pytest.raises(AssertionError):
-        if action=='propose':x.propose(2,actor,'b')
-        elif action=='self-approve':x.approve(2,pid,actor)
-        else:x.close(2,pid,actor)
+    with pytest.raises(AssertionError):x.approve(2,pid,'payer')
+    x.approve(2,pid,'recipient')
+    assert x.steps[2]['version']==2 and x.steps[2]['digest']=='b'
 
 @pytest.mark.parametrize('index',[0])
 def test_amendment_rejects_active_and_completed_steps(index):
@@ -77,6 +78,10 @@ def test_amendment_rejects_active_and_completed_steps(index):
 def test_amendment_rejects_previously_completed_step():
     x=AmendmentLedger();x.active=2
     with pytest.raises(AssertionError):x.propose(1,'payer','b')
+
+def test_amendment_unavailable_on_terminal_flow():
+    x=AmendmentLedger();x.state='COMPLETED'
+    with pytest.raises(AssertionError):x.propose(2,'payer','b')
 
 @pytest.mark.parametrize('cancel',[True,False])
 def test_cancelled_or_rejected_proposal_cannot_be_approved(cancel):

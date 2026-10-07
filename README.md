@@ -17,10 +17,10 @@ Flowed is a funded sequential semantic workflow on GenLayer. One payer funds a 2
 - Network: **GenLayer Studionet**
 - Chain ID: `61999`
 - RPC: `https://studio.genlayer.com/api`
-- Canonical deployed source commit: `c628a86951d59de4c774d89cb4c8ae5cbb1e4e47`
-- Canonical contract Git blob: `b8c351464cf876fedb1c1b0312670a1a4d693b5b`
-- Canonical source SHA-256: `0aac468a81efe683798271e0c38c6e582eeef515386bb8e4a1d8eed8defd72b4`
-- Deployment tx: [`0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a`](https://explorer-studio.genlayer.com/tx/0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a)
+- Accepted historical deployed source: `c628a86951d59de4c774d89cb4c8ae5cbb1e4e47` (historical contract above; source SHA-256 `0aac468a81efe683798271e0c38c6e582eeef515386bb8e4a1d8eed8defd72b4`; Git blob `b8c351464cf876fedb1c1b0312670a1a4d693b5b`)
+- Historical deployment transaction: [`0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a`](https://explorer-studio.genlayer.com/tx/0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a)
+- Milestone deployed source: `5ede53d8a2a1ec164df5d2f4962e3dda2d908c92` (milestone contract above; source SHA-256 `97332aa0cfb4f8d0a497421e466ab30953d93cebfb60661cbf6d1121ca88aea8`)
+- Milestone deployment transaction: [`0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1`](https://explorer-studio.genlayer.com/tx/0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1)
 - Runtime: `v0.2.16`
 - Runner: `py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6`
 

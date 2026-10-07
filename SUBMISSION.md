@@ -35,10 +35,11 @@ The model is allowed to classify the frozen evidence snapshot as `SATISFIED`, `N
 - Accepted historical contract (without amendments; retained for historical evidence): [`0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad`](https://explorer-studio.genlayer.com/address/0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad)
 - Current production frontend contract: [`0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443`](https://explorer-studio.genlayer.com/address/0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443)
 - Network: GenLayer Studionet `61999`
-- Canonical deployed source: `c628a86951d59de4c774d89cb4c8ae5cbb1e4e47`
-- Deployment tx: [`0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a`](https://explorer-studio.genlayer.com/tx/0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a)
+- Accepted historical deployed source (`0xE7aE...` historical contract): `c628a86951d59de4c774d89cb4c8ae5cbb1e4e47`; source SHA-256 `0aac468a81efe683798271e0c38c6e582eeef515386bb8e4a1d8eed8defd72b4`
+- Historical deployment tx: [`0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a`](https://explorer-studio.genlayer.com/tx/0xdb045eda9076fc5c2053fc1f23655856005b8962dd1a7eebfca873ba7be5326a)
+- Milestone deployed source (`0xAcCc...` milestone contract): `5ede53d8a2a1ec164df5d2f4962e3dda2d908c92`; source SHA-256 `97332aa0cfb4f8d0a497421e466ab30953d93cebfb60661cbf6d1121ca88aea8`
 
-The amendment milestone is separately deployed at [`0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443`](https://explorer-studio.genlayer.com/address/0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443), with finalized deployment transaction [`0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1`](https://explorer-studio.genlayer.com/tx/0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1). Full deployment and lifecycle evidence: [docs/AMENDMENT_LIVE_VERIFICATION.md](docs/AMENDMENT_LIVE_VERIFICATION.md).
+The amendment milestone is deployed at [`0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443`](https://explorer-studio.genlayer.com/address/0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443), with finalized deployment transaction [`0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1`](https://explorer-studio.genlayer.com/tx/0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1). Full deployment and lifecycle evidence: [docs/AMENDMENT_LIVE_VERIFICATION.md](docs/AMENDMENT_LIVE_VERIFICATION.md).
 
 The production frontend at https://flowed-eight.vercel.app/ now uses the amendment milestone contract. Its production deployment and live verification are documented in [docs/AMENDMENT_LIVE_VERIFICATION.md](docs/AMENDMENT_LIVE_VERIFICATION.md).
 

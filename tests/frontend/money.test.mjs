@@ -52,9 +52,13 @@ test('pending proposal actions are limited to counterparty or proposer', () => {
   assert.equal(counterparty.canApprove, true); assert.equal(counterparty.canReject, true); assert.equal(counterparty.canCancel, false);
   assert.equal(proposer.canCancel, true); assert.equal(proposer.canApprove, false);
 });
-test('finalized execution result requires explicit success evidence', () => {
-  assert.equal(finalizedExecutionSucceeded({ statusName: 'FINALIZED', txExecutionResultName: 'FINISHED_WITH_RETURN' }), true);
-  assert.equal(finalizedExecutionSucceeded({ statusName: 'FINALIZED', consensus_data: { leader_receipt: { execution_result: 'SUCCESS' } } }), true);
+test('shared production receipt classifier requires finalized explicit execution success and agreement', () => {
+  assert.equal(finalizedExecutionSucceeded({ statusName: 'FINALIZED', resultName: 'MAJORITY_AGREE', txExecutionResultName: 'FINISHED_WITH_RETURN' }), true);
+  assert.equal(finalizedExecutionSucceeded({ status_name: 'FINALIZED', consensus_data: { leader_receipt: [{ execution_result: 'SUCCESS' }] } }), true);
+  assert.equal(finalizedExecutionSucceeded({ statusName: 'FINALIZED', resultName: 'MAJORITY_DISAGREE', consensus_data: { leader_receipt: { execution_result: 'SUCCESS' } } }), false);
+  assert.equal(finalizedExecutionSucceeded({ statusName: 'FINALIZED', result_name: 'NO_MAJORITY', consensus_data: { leader_receipt: { execution_result: 'SUCCESS' } } }), false);
+  assert.equal(finalizedExecutionSucceeded({ statusName: 'FINALIZED', txExecutionResultName: 'EXECUTION_ERROR', consensus_data: { leader_receipt: { execution_result: 'SUCCESS' } } }), false);
+  assert.equal(finalizedExecutionSucceeded({ statusName: 'FINALIZED', txExecutionResult: '0', consensus_data: { leader_receipt: { execution_result: 'SUCCESS' } } }), false);
   assert.equal(finalizedExecutionSucceeded({ statusName: 'FINALIZED' }), false);
   assert.equal(finalizedExecutionSucceeded({ statusName: 'ACCEPTED', txExecutionResultName: 'FINISHED_WITH_RETURN' }), false);
 });
