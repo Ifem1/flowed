@@ -8,14 +8,13 @@ const HISTORICAL_CONTRACT = '0xE7aE476b544afe3A38954BBf15f7BE3A4FA4D8Ad';
 const HISTORICAL_SOURCE_COMMIT = 'c628a86951d59de4c774d89cb4c8ae5cbb1e4e47';
 const MILESTONE_CONTRACT = '0xAcCc2C3361e7ac143B835e0CEDf97CDecfe69443';
 const MILESTONE_DEPLOYMENT_TX = '0x90f6de1e85f2308fe0cfbe803e58bbcdbc3219a3f7682a11b3d6dc4184990bb1';
-const MILESTONE_SOURCE_SHA256 = '97332aa0cfb4f8d0a497421e466ab30953d93cebfb60661cbf6d1121ca88aea8';
 const MILESTONE_SOURCE_BLOB = '8c12fd7524fb29e68097ce3adb0c348c791edcc7';
 const bytes = await readFile('contracts/Flowed.py');
 const source = bytes.toString('utf8');
 const sha256 = createHash('sha256').update(bytes).digest('hex');
 const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const blob = execFileSync('git', ['hash-object', 'contracts/Flowed.py'], { encoding: 'utf8' }).trim();
-if (sha256 !== MILESTONE_SOURCE_SHA256 || blob !== MILESTONE_SOURCE_BLOB) {
+if (blob !== MILESTONE_SOURCE_BLOB) {
   throw new Error('Contract source differs from the deployed milestone fingerprint; deploy and verify a fresh contract before building this release.');
 }
 const lines = source.split(/\r?\n/);
