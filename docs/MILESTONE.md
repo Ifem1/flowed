@@ -16,7 +16,9 @@ Limits: at most 8 proposal attempts and 4 accepted amendments per step; at most 
 
 ## Verification
 
-Final local verification: Python contract/protocol suite `38 passed`; frontend suite `24 passed`; frontend lint, typecheck, contract syntax validation, production build, and `git diff --check` passed. GenVM linter static checks pass, but SDK validation on this Windows host is blocked by `Access is denied` loading the cached GenLayer SDK. Direct Mode fails in the pinned `gltest` loader before contract logic when it tries to remove an open temporary file (`PermissionError`, WinError 32). No Direct Mode pass is claimed.
+Local verification: Python contract/protocol suite `38 passed`; frontend suite `24 passed`; frontend lint, typecheck, contract syntax validation, production build, and `git diff --check` passed. GitHub Actions [Flowed CI](https://github.com/Ifem1/flowed/actions/runs/37661947807) passed, including Studionet preflight and both test suites. The separate [canonical live verifier](https://github.com/Ifem1/flowed/actions/runs/37661947878) passed against the accepted historical deployment and Flow 2 evidence; it is not amendment live proof.
+
+GenVM lint's three static checks pass, but local SDK validation is blocked by Windows `Access is denied` loading the cached GenLayer SDK. Direct Mode was not achieved: local Windows failed in the `gltest` loader deleting its open temp file (`PermissionError`, WinError 32); on GitHub Linux, all six Direct Mode tests fail with `DecodingError: unexpected end of memory` while loading the pinned stable v0.2.16 contract, before contract logic executes. No Direct Mode pass is claimed.
 
 ## Deployment and live amendment demonstration
 
